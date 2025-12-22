@@ -1,0 +1,30 @@
+.mobilestore{
+    max-width:1536px;
+    height:665px;
+    margin:0px auto;
+    display: flex;
+    align-items: center;
+    padding:204px 170px;
+}
+.mobilestore .apptext p{
+    color:#666666;
+    margin-bottom:43px;
+    
+}
+.mobilestore .apptext .buttonsapp{
+    display: flex;
+    align-items: center;
+    gap:20px;
+   
+}
+.mobilestore .imgapp img{
+    width:632px;
+    height:525px;
+
+}
+
+
+
+
+
+

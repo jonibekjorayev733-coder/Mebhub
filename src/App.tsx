@@ -1,59 +1,47 @@
-import { useState } from "react"
-import TaskList from "./Componenta/TaskList"
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import modal from './Componenta/Moddal';
+import { Routes, Route } from "react-router-dom";
 
-function App() {
-
-    const [tasks, setTasks] = useState([
-        {
-            id: 1,
-            title: "oltin olma du ol",
-            status: "inprogress"
-        },
-        {
-            id: 2,
-            title: "pul olma du ol",
-            status: "completed"
-        },
-        {
-            id: 3,
-            title: "olma olma du ol",
-            status: "verified"
-        },
-    ])
-
-    const [status, setStatus] = useState("all")
-
-    function updateStatus(id, status) {
-        let newTasks = tasks.map((task) => {
-            if (task.id === id) {
-                task.status = status
-            }
-            return task
-        })
-        setTasks(newTasks)
-    }
+import Fresh from "./Component/fresh/Fresh";
+import Header from "./Component/header/Header";
+import Main from "./Component/main/Main";
+import Mobilestore from "./Component/mobilestore/Mobilestore";
+import Section from "./Component/section/Section";
+import Sectionone from "./Component/sectionone/Sectionone";
+import Sectiontwo from "./Component/sectiontwo/Sectiontwo";
+import Footer from "./Component/footer/Footer";
+import Bestselling from "./bestSelling/Bestselling";
+import Login from "./Component/Admindonlod/Login";
+import './index.css';
+import Cart from "./Component/Componentproduct/Pages/Cart"
+import AdminPanel from "./Component/Admindonlod/AdminPanel/adminpanelone/AdminPanel"
+import Cheforder from "./Component/Admindonlod/Chefpanel/adminpanelone/AdminPanel"
 
 
-    return (
-        <div className="container mt-5">
+export default function App() {
 
-            <button onClick={() => setStatus("all")} className="btn btn-outline-success mx-2" >All</button>
-            <button onClick={() => setStatus("inprogress")} className="btn btn-outline-success mx-2" >inprogress</button>
-            <button onClick={() => setStatus("completed")} className="btn btn-outline-success mx-2" >completed</button>
-            <button onClick={() => setStatus("verified")} className="btn btn-outline-success mx-2" >verified</button>
-            <button type="submit" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop" >
-  Launch static backdrop modal
-</button>
-            <TaskList
-                updateStatus={updateStatus}
-                tasks={status == "all" ? tasks : tasks.filter(task => task.status == status)}
-            />
+  return (
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <>
+            <Header />
+            <Main />
+            <Section />
+            <Fresh />
+            <Sectionone />
+            <Sectiontwo />
+            <Bestselling />
+            <Mobilestore />
+            <Footer />
+          </>
+        }
+      />
 
-        </div>
-    )
+<Route path="/login" element={<Login />} />
+<Route path="/chef" element={<Cheforder/>}/>
+<Route path="/admin" element={<AdminPanel/>} />
+
+<Route path="/cart" element={<Cart />} />
+    </Routes>
+  );
 }
-
-export default App
