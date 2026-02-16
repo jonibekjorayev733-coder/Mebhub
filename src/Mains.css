@@ -1,0 +1,48 @@
+/* Mains.css - GLOBAL STYLE RESTORATION */
+
+:root {
+    /* ULTRA-VIOLET TOKENS (Isolated use only) */
+    --uv-primary: #7c3aed;
+    --uv-primary-soft: rgba(124, 58, 237, 0.4);
+    --uv-secondary: #0ea5e9;
+    --uv-accent: #d946ef;
+
+    --uv-glass: rgba(15, 15, 30, 0.7);
+    --uv-border: rgba(255, 255, 255, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* RESTORE GLOBAL BACKGROUND */
+body {
+    background-color: #fff;
+    color: #333;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+.web-clone {
+    max-width: 100%;
+    margin: 0 auto;
+    min-height: 100vh;
+}
+
+.web-clone .center {
+    width: 1521px;
+    margin: 0 auto;
+}
+
+@media (max-width: 1560px) {
+    .web-clone .center {
+        width: 100%;
+    }
+}
+
+/* Helper for isolated panels */
+.uv-panel-bg {
+    background-color: #030308;
+    color: #fff;
+}

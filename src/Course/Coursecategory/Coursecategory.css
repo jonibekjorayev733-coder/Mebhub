@@ -1,0 +1,89 @@
+.coursecategory {
+    padding: 40px 60px;
+    background-color: #f8f9fa;
+}
+
+.category-grid {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.category-card {
+    background: white;
+    border-radius: 12px;
+    padding: 32px 24px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.category-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.icon-box {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 16px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.design .icon-box {
+    background-color: #dbeafe;
+    color: #2563eb;
+}
+
+.development .icon-box {
+    background-color: #e0e7ff;
+    color: #6366f1;
+}
+
+.development-alt .icon-box {
+    background-color: #dbeafe;
+    color: #3b82f6;
+}
+
+.business .icon-box {
+    background-color: #d1fae5;
+    color: #059669;
+}
+
+.marketing .icon-box {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.photography .icon-box {
+    background-color: #e5e7eb;
+    color: #4b5563;
+}
+
+.acting .icon-box {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.business-alt .icon-box {
+    background-color: #d1fae5;
+    color: #10b981;
+}
+
+.category-card h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 12px;
+}
+
+.category-card p {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.5;
+}

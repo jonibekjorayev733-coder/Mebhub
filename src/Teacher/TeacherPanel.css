@@ -1,0 +1,114 @@
+/* StudentMessaging_dark_premium.css - DARK VERSION */
+
+:root {
+  --uv-bg: #0d1117;
+  --uv-chat: rgba(13, 17, 23, 0.78);
+  --uv-primary: #7c3aed;
+  --uv-primary-end: #5b21b6;
+  --uv-accent: #c084fc;
+  --uv-border: rgba(255,255,255,0.08);
+  --uv-text: #e2e8f0;
+  --uv-text-dim: #94a3b8;
+  --uv-glass: rgba(255,255,255,0.05);
+  --uv-glass-hover: rgba(255,255,255,0.12);
+  --uv-shadow: rgba(0,0,0,0.55);
+}
+
+.student-messaging {
+  position: fixed;
+  inset: 0;
+  background: var(--uv-bg);
+  color: var(--uv-text);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: system-ui, sans-serif;
+}
+
+/* Background (nebula + stars) */
+.uv-background-wrapper { /* oldingi kod bilan bir xil */ }
+.nebula-uv { /* oldingi kod bilan bir xil */ }
+.stars-uv { /* oldingi kod bilan bir xil */ }
+
+/* Header */
+.messaging-header {
+  padding: 16px 24px;
+  background: rgba(13,17,23,0.9);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--uv-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 30px var(--uv-shadow);
+}
+
+.back-btn { /* oldingi dark header tugmasi bilan bir xil */ }
+
+/* Messages */
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.message {
+  max-width: 75%;
+}
+
+.message.sent .message-content {
+  background: linear-gradient(135deg, var(--uv-primary), var(--uv-primary-end));
+  color: white;
+  border-radius: 20px 4px 20px 20px;
+  box-shadow: 0 5px 20px rgba(124,58,237,0.4);
+}
+
+.message.received .message-content {
+  background: rgba(255,255,255,0.07);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--uv-border);
+  border-radius: 4px 20px 20px 20px;
+}
+
+/* Input */
+.message-form-container {
+  padding: 16px 20px;
+  border-top: 1px solid var(--uv-border);
+  background: rgba(13,17,23,0.6);
+}
+
+.message-form {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(124,58,237,0.3);
+  border-radius: 999px;
+  padding: 7px 12px;
+}
+
+.message-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #ffffff !important;
+  font-size: 15px;
+  padding: 10px 4px;
+}
+
+.message-input::placeholder {
+  color: rgba(255,255,255,0.45);
+}
+
+.send-btn {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, var(--uv-primary), var(--uv-accent));
+  border-radius: 50%;
+  color: white;
+  box-shadow: 0 0 14px rgba(124,58,237,0.45);
+}
+
+/* Scrollbar, modal, emoji picker — oldingi dark versiyadan olingan */

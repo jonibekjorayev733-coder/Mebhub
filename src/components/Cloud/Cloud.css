@@ -1,0 +1,70 @@
+.cloud{
+    text-align: center;
+}
+.cloud h1{
+    margin-bottom:20px;
+}
+.cloud h1 b{
+    color: rgba(0, 203, 184, 1);
+    margin-left:10px;
+
+}
+
+.cloud p{
+    color:rgba(105, 105, 132, 1);
+    font-size:18px;
+    margin-bottom:160px;
+}
+.cloud .drop{
+    background: rgba(255, 255, 255, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap:60px;
+}
+.cloud .drop .drop1{
+    
+  padding:122px 54px;
+  justify-items: center;
+  width:450px;
+  box-shadow: 0px 10px 60px 0px rgba(3, 8, 59, 0.344);
+  height:430px;
+  border-radius:20px;
+  
+}
+
+.cloud .drop .drop1  h1{
+   font-weight:500;
+   line-height:100%;
+   font-family:Poppins;
+   font-size:25px;
+   color: rgba(47, 50, 125, 1);
+
+}
+
+.cloud .drop .drop1  p{
+   font-weight:400;
+   line-height:100%;
+   font-family:Poppins;
+   font-size:15px;
+   color: rgba(105, 105, 132, 1);
+}
+
+.drop .drop1 .text{
+    width:100px;
+    height:100px;
+    display: flex;
+    border-radius:50%;
+    margin-bottom:79px;
+    align-items:center;
+    justify-content: center;
+    margin-top:-180px;
+    background: rgba(91, 114, 238, 1);
+
+}
+
+
+.drop1 .text .mens{
+    font-size:30px;
+    color:white;
+}

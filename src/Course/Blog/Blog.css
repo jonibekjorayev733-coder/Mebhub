@@ -1,0 +1,45 @@
+.blog{
+    padding: 60px;
+    background-color: #f8f9fa;
+}
+
+.blog-container{
+    max-width: 1400px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    border-radius: 16px;
+    padding: 60px 80px;
+    text-align: center;
+    color: white;
+}
+
+.blog-container h2{
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.blog-subtitle{
+    font-size: 16px;
+    line-height: 1.6;
+    color: #cbd5e1;
+    max-width: 800px;
+    margin: 0 auto 30px;
+}
+
+.start-learning-btn{
+    padding: 14px 32px;
+    background-color: #06b6d4;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.start-learning-btn:hover{
+    background-color: #0891b2;
+}

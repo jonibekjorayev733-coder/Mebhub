@@ -1,0 +1,138 @@
+.Totc{
+    justify-items: center;
+    text-align: center;
+    margin:150px 310px;
+    height:708px;
+}
+.Totc .totctext .men{
+  color:#000000;
+}
+.Totc .totctext b{
+    color:#00CBB8;
+}
+
+.Totc .totctext p{
+    color:#2f365b;
+    margin-top:20px;
+    margin-bottom:80px;
+}
+.Totc .totcvideo{
+    display: flex;
+    gap:100px;
+    align-items: center;
+}
+.img-container {
+    position: relative;
+    width: 600px;
+    height: 403px;
+    border-radius: 20px;
+    overflow: hidden;
+}
+.img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #171B4180;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.overlay h1 {
+    color: white;
+    margin: 0 0 20px 0;
+    font-size: 28px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+.overlay button {
+    height:80px;
+    width:283px;
+    color:white;
+    background-color:rgba(255, 222, 173, 0);
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    border:1px solid white;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+.overlay button:hover {
+    background-color:#23BDEEE5;
+    color: #fff;
+    border:none;
+    transform: scale(1.05);
+}
+
+@media (max-width: 1024px) {
+    .Totc {
+        margin: 100px 50px;
+        height: auto;
+    }
+    .totcvideo {
+        gap: 50px;
+    }
+    .img-container {
+        width: 400px;
+        height: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    .Totc {
+        margin: 50px 20px;
+    }
+    .totcvideo {
+        flex-direction: column;
+        gap: 30px;
+    }
+    .img-container {
+        width: 100%;
+        height: 250px;
+    }
+    .overlay h1 {
+        font-size: 20px;
+    }
+    .overlay button {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .Totc {
+        margin: 30px 10px;
+    }
+    .totctext h1 {
+        font-size: 24px;
+    }
+    .totctext p {
+        font-size: 14px;
+        margin-bottom: 40px;
+    }
+    .img-container {
+        height: 250px;
+    }
+    .overlay {
+        padding: 10px;
+    }
+    .overlay h1 {
+        font-size: 18px;
+        margin-bottom: 15px;
+    }
+    .overlay button {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+}

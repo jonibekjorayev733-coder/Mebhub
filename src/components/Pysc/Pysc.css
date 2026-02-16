@@ -1,0 +1,142 @@
+.pysc{
+    display: flex;
+    margin:160px 186px;
+    gap:40px;
+
+    
+}
+.pysc .lessonvideo img{
+  width:705px;
+  height:470px;
+}
+
+.pysc .lessonvideotext h1{
+    font-family: Poppins;
+font-weight: 500;
+font-size: 20px;
+line-height: 160%;
+color:rgb(57, 55, 100);
+letter-spacing: 0%;
+margin-bottom:30px;
+
+}
+.lessonvideotext p{
+    color:#696984;
+    font-family: Poppins;
+font-weight: 400;
+font-size: 14px;
+line-height: 180%;
+letter-spacing: 2%;
+
+}
+.lessonvideotext b{
+    color:#00CBB8;
+}
+
+.lessonvideotext {
+    position: relative;
+}
+
+.text-circle {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background-color:#33EFA0; 
+    z-index: -1;
+}
+
+.text-circle.top {
+    top: -10px;
+    right: 360px;
+    border-radius:30px;
+    
+}
+
+.text-circle.bottom {
+    bottom: 330px;
+    left: 370px;
+    border-radius:50%;
+    width:30px;
+    height:30px;
+}
+
+.lessonvideo {
+    position: relative;
+}
+
+.blue {
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    width: 138px;
+    border-radius:20px;
+    height: 138px;
+    background-color: #007bff; 
+    z-index: -1;
+}
+
+.green {
+    position: absolute;
+    bottom: -15px;
+    right: -15px;
+    border-radius:20px;
+    width: 231px;
+    height: 231px;
+    background-color:#33EFA0; 
+    z-index: -1;
+}
+
+@media (max-width: 1024px) {
+    .pysc {
+        margin: 100px 50px;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .pysc .lessonvideo img {
+        width: 100%;
+        height: auto;
+    }
+    .blue {
+        width: 60px;
+        height: 60px;
+        top: -10px;
+        left: -10px;
+    }
+    .green {
+        width: 50px;
+        height: 50px;
+        bottom: -10px;
+        right: -10px;
+    }
+    .text-circle {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .pysc {
+        margin: 50px 20px;
+    }
+    .lessonvideotext h1 {
+        font-size: 18px;
+    }
+    .lessonvideotext p {
+        font-size: 12px;
+    }
+    .text-circle {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pysc {
+        margin: 30px 10px;
+    }
+    .blue,
+    .green,
+    .text-circle {
+        display: none; /* Hide decorative elements on small screens */
+    }
+}

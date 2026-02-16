@@ -1,0 +1,23 @@
+.section{
+    padding:100px 196px;
+    text-align: center;
+}
+.section .sectiontext{
+   display: flex;
+   justify-content: center;
+   gap:95px;
+
+}
+.sectiontext h1{
+    color:rgb(92, 92, 228);
+}
+.section strong{
+    font-family:Buenos Aires Trial;
+    font-weight:700;
+    font-size:48px;
+    
+}
+.section p{
+    margin-top:16px;
+    margin-bottom:30px;
+}

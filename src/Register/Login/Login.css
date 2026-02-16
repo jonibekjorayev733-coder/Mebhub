@@ -1,0 +1,483 @@
+/* Page bg (Figma'dagi kulrang fon) */
+.authPage {
+  display: grid;
+  place-items: center;
+}
+
+/* Asosiy oq card */
+.authCard {
+  width: min(1740px, 100%);
+  background: #ffffff;
+  height:100%;
+  padding: 22px;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 34px;
+}
+
+/* LEFT */
+.authLeft {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  height: 690px;
+}
+
+.authLeft__img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* pastdagi yozuvlar */
+.authLeft__overlay {
+  position: absolute;
+  left: 28px;
+  bottom: 24px;
+  color: #ffffff;
+  text-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+}
+
+.authLeft__overlay h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.authLeft__overlay p {
+  margin: 6px 0 0;
+  font-size: 14px;
+  opacity: 0.95;
+}
+
+/* RIGHT */
+.authRight {
+  display: grid;
+  place-items: center;
+}
+
+.authRight__inner {
+  width: min(420px, 100%);
+  text-align: center;
+}
+
+.authRight__welcome {
+  font-size: 12px;
+  color: #2c2c2c;
+  margin-bottom: 14px;
+}
+
+/* Toggle pill */
+.authToggle {
+width: 100%;
+  max-width: 340px;
+  margin: 0 auto;
+  background: #86d6d1;
+  border-radius: 999px;
+  padding: 6px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.authToggle__btn {
+  height: 34px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.authToggle__btn.isActive {
+  background: #3fb7b0;
+  box-shadow: 0 12px 24px rgba(63, 183, 176, 0.35);
+}
+
+/* desc */
+.authRight__desc {
+  margin: 18px auto 16px;
+  max-width: 340px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #c9bebe;
+}
+
+/* form */
+.authForm {
+  text-align: left;
+  margin-top: 6px;
+}
+
+.authLabel {
+  display: block;
+  margin: 14px 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #2b2b2b;
+}
+
+.authInput {
+  width: 100%;
+  height: 42px;
+  border-radius: 999px;
+  border: 1.6px solid #7fd6d2;
+  padding: 0 18px;
+  font-size: 13px;
+  outline: none;
+}
+
+.authInput::placeholder {
+  color: #7e2929;
+}
+
+.authInput:focus {
+  border-color: #3fb7b0;
+  box-shadow: 0 0 0 4px rgba(63, 183, 176, 0.18);
+}
+
+/* password with icon */
+.authPass {
+  position: relative;
+}
+
+.authInput--pass {
+  padding-right: 42px;
+}
+
+.authEye {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #4984b1;
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.authEye:hover {
+  opacity: 1;
+}
+
+/* remember & forgot */
+.authRow {
+  margin-top: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.authRemember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #2b2b2b;
+}
+
+.authRemember input {
+  width: 14px;
+  height: 14px;
+}
+
+.authLink {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  color: #2b2b2b;
+  opacity: 0.85;
+}
+
+/* submit */
+.authSubmit {
+  width: 160px;
+  height: 42px;
+  border: none;
+  border-radius: 999px;
+  background: #3fb7b0;
+  color: #ffffff;
+  font-weight: 800;
+  cursor: pointer;
+  display: block;
+  margin: 22px auto 0;
+  box-shadow: 0 18px 30px rgba(63, 183, 176, 0.35);
+}
+
+/* responsive */
+@media (max-width: 900px) {
+  .authCard {
+    grid-template-columns: 1fr;
+  }
+
+  .authLeft {
+    height: 360px;
+  }
+}
+
+
+/* =========================
+   GLOBAL RESPONSIVE HELPERS
+========================= */
+* {
+  box-sizing: border-box;
+}
+
+.authPage {
+  min-height: 100vh;
+  padding: 16px;
+}
+
+/* katta ekranlarda markaz */
+.authCard {
+  height: auto;            /* 100%ni olib tashla */
+  min-height: 600px;
+}
+
+/* =========================
+   1440px - 1200px (Laptop)
+========================= */
+@media (max-width: 1440px) {
+  .authCard {
+    width: min(1200px, 100%);
+    gap: 28px;
+    padding: 18px;
+  }
+
+  .authLeft {
+    height: 620px;
+  }
+
+  .authRight__inner {
+    width: min(400px, 100%);
+  }
+
+  .authToggle {
+    width: 320px;
+  }
+}
+
+/* =========================
+   1200px - 992px (Small laptop)
+========================= */
+@media (max-width: 1200px) {
+  .authCard {
+    width: min(1000px, 100%);
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    padding: 16px;
+  }
+
+  .authLeft {
+    height: 520px;
+  }
+
+  .authLeft__overlay h2 {
+    font-size: 24px;
+  }
+}
+
+/* =========================
+   992px - 768px (Tablet landscape)
+========================= */
+@media (max-width: 992px) {
+  .authCard {
+    grid-template-columns: 1fr;
+    width: min(700px, 100%);
+    gap: 18px;
+  }
+
+  .authLeft {
+    height: 380px;
+  }
+
+  .authRight__inner {
+    width: min(420px, 100%);
+  }
+
+  .authToggle {
+    width: 320px;
+  }
+}
+
+/* =========================
+   768px - 576px (Tablet portrait / Big phones)
+========================= */
+@media (max-width: 768px) {
+  .authPage {
+    padding: 12px;
+  }
+
+  .authCard {
+    padding: 14px;
+  }
+
+  .authLeft {
+    height: 320px;
+    border-radius: 14px;
+  }
+
+  .authLeft__overlay {
+    left: 18px;
+    bottom: 16px;
+  }
+
+  .authLeft__overlay h2 {
+    font-size: 22px;
+  }
+
+  .authToggle {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .authRight__desc {
+    font-size: 12px;
+  }
+}
+
+/* =========================
+   576px - 0px (Phones)
+========================= */
+@media (max-width: 576px) {
+  .authCard {
+    padding: 12px;
+    gap: 14px;
+  }
+
+  .authLeft {
+    height: 260px;
+  }
+
+  .authLeft__overlay h2 {
+    font-size: 18px;
+  }
+
+  .authLeft__overlay p {
+    font-size: 12px;
+  }
+
+  .authRight__inner {
+    width: 100%;
+  }
+
+  .authLabel {
+    font-size: 12px;
+  }
+
+  .authInput {
+    height: 40px;
+    font-size: 13px;
+  }
+
+  .authToggle__btn {
+    height: 32px;
+    font-size: 13px;
+  }
+
+  .authRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .authSubmit {
+    width: 100%;
+    max-width: 220px;
+  }
+}
+
+/* --------------- 360px dan past --------------- */
+@media (max-width: 360px) {
+  .authPage { padding: 10px; }
+
+  .authCard {
+    padding: 10px;
+    gap: 12px;
+  }
+
+  .authLeft { height: 210px; }
+
+  .authRight__inner { width: 100%; }
+
+  .authToggle {
+    width: 100%;
+    max-width: 260px;
+    padding: 5px;
+    gap: 5px;
+  }
+
+  .authToggle__btn {
+    height: 30px;
+    font-size: 12px;
+  }
+
+  .authInput {
+    height: 38px;
+    padding: 0 14px;
+    font-size: 12px;
+  }
+
+  .authSubmit {
+    width: 100%;
+    max-width: 200px;
+    height: 40px;
+    font-size: 13px;
+  }
+
+  .authLeft__overlay { left: 14px; bottom: 12px; }
+  .authLeft__overlay h2 { font-size: 16px; }
+  .authLeft__overlay p { font-size: 11px; }
+}
+
+/* --------------- 320px va past --------------- */
+@media (max-width: 320px) {
+  .authCard { padding: 8px; gap: 10px; }
+
+  .authLeft { height: 190px; border-radius: 12px; }
+
+  .authToggle { max-width: 240px; }
+
+  .authRight__desc {
+    font-size: 11px;
+    margin: 14px auto 12px;
+  }
+
+  .authLabel { margin: 12px 0 6px; font-size: 11px; }
+
+  .authRow { gap: 6px; }
+  .authRemember { font-size: 11px; }
+  .authLink { font-size: 11px; }
+
+  .authEye { right: 12px; }  /* icon joyi */
+}
+
+/* --------------- 280px va past (ENG KICHIK) --------------- */
+@media (max-width: 280px) {
+  .authPage { padding: 8px; }
+
+  .authCard { padding: 8px; gap: 8px; }
+
+  .authLeft { height: 170px; }
+
+  .authToggle { max-width: 210px; }
+
+  .authToggle__btn { height: 28px; font-size: 11px; }
+
+  .authInput {
+    height: 36px;
+    padding: 0 12px;
+    font-size: 11px;
+  }
+
+  .authInput--pass { padding-right: 38px; }
+  .authEye { right: 10px; }
+
+  .authSubmit { max-width: 180px; height: 38px; }
+}
+

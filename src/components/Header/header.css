@@ -1,0 +1,170 @@
+.header {
+  max-width: 1521px;
+  min-height: 143px;
+  margin: 0 auto;
+  padding: 30px 80px;
+  background-color: #49BBBD;
+}
+
+.header .head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+
+/* logo */
+.head img {
+  width: 100%;
+  max-width: 114px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* menu */
+.head .headerright ul {
+  display: flex;
+  list-style: none;
+  gap: 79px;
+  padding: 0;
+  margin: 0;
+}
+
+.head .headerright {
+  display: flex;
+  align-items: center;
+  gap: 81px;
+}
+
+button {
+  width: 160px;
+  height: 60px;
+  border-radius: 80px;
+  border: none;
+  text-decoration: none;
+
+  font-family: poppins;
+  font-size: 19px;
+  font-weight: 200;
+}
+
+.headerbutton button:nth-child(2) {
+  background-color: rgba(255, 255, 255, 0.302);
+  box-shadow: 0px 20px 24px 0px rgba(0, 0, 0, 0.03);
+  color: white;
+}
+
+
+.head .headerright ul li a {
+  text-decoration: none;
+  color: #fff;
+
+  font-family: poppins;
+  font-size: 19px;
+  font-weight: 200;
+}
+
+.headerbutton {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+
+}
+
+
+/* ================= USER AVATAR ================= */
+
+.userBox {
+  position: relative;
+}
+
+.avatarBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 40px;
+  transition: background 0.2s ease;
+}
+
+.avatarBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.avatarCircle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: white;
+  color: #49BBBD;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  overflow: hidden;
+  font-size: 18px;
+  font-family: poppins;
+}
+
+.avatarImg {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+}
+
+.avatarName {
+  color: white;
+  font-family: poppins;
+  font-size: 17px;
+}
+
+.avatarArrow {
+  color: white;
+  font-size: 14px;
+}
+
+/* ================= DROPDOWN MENU ================= */
+
+.userMenu {
+  position: absolute;
+  right: 0;
+  top: 60px;
+  width: 180px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  padding: 8px 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+.menuItem {
+  padding: 12px 18px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: poppins;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.menuItem:hover {
+  background: #f5f5f5;
+}
+
+.menuLogout {
+  color: crimson;
+}
+
+.menuLine {
+  height: 1px;
+  background: #eee;
+  margin: 6px 0;
+}

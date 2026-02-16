@@ -1,0 +1,245 @@
+.mainleft {
+    background-color: #49BBBD;
+    padding: 322px 80px;
+    height: 1118px;
+    border-bottom-left-radius: 29% 12%;
+    border-bottom-right-radius: 29% 12%;
+    display: flex;
+    gap: 270px;
+    align-items: center;
+}
+
+.mainleft h1 {
+    color: white;
+    margin-bottom: 34px;
+}
+
+.mainleft b {
+    color: rgb(227, 139, 50);
+}
+
+.mainleft p {
+    color: white;
+    margin-bottom: 52px;
+}
+
+.mainleft .maintext {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+.mainleft .maintext button:nth-child(1) {
+    background-color: #FFFFFF4D;
+    box-shadow: 0px 20px 24px 0px rgba(0, 0, 0, 0.03);
+    color: white;
+}
+
+.mainleft .maintext button:nth-child(2) {
+    background-color: white;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+
+}
+
+.maintext button img {
+    width: 33px;
+    height: 33px;
+    display: flex;
+
+    margin: 0px auto;
+    position: relative;
+
+}
+
+.maintext .play {
+    display: flex;
+    align-items: center;
+}
+
+.maintext .h4 {
+    color: white;
+}
+
+.mainright img {
+    height: 892px;
+    width: 544px;
+}
+
+.mainright .pet1 {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    width: 300px;
+    height: 100px;
+    position: absolute;
+    margin-top: -629px;
+    margin-left: -200px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    padding: 25px 28px;
+
+
+}
+
+.mainright .pet2 p:nth-child(2) {
+    color: black;
+    margin-top: 20px;
+    margin-left: 32px;
+}
+
+.mainright .pet2 p:nth-child(3) {
+    margin-top: 89px;
+    color: black;
+    margin-left: -30px;
+}
+
+
+.mainright .pet2 {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    width: 300px;
+
+    height: 100px;
+    position: absolute;
+    margin-top: -409px;
+    margin-left: 330px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    padding: 25px 28px;
+
+}
+
+.mainright .pet1 p:nth-child(2) {
+    color: black;
+    margin-top: 20px;
+    margin-left: 32px;
+}
+
+.mainright .pet1 p:nth-child(3) {
+    margin-top: 89px;
+    color: black;
+    margin-left: -30px;
+}
+
+.mainright .pet3 {
+    position: absolute;
+    /* Rectangle 6 */
+
+    position: absolute;
+    width: 390px;
+    height: 187px;
+    left: 600px;
+    top: 764px;
+
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+
+    width: 390px;
+    height: 187px;
+}
+
+.pet1 .icon .FaRegCalendarAlt {
+    color: white;
+    font-size: 30px;
+    background: #23BDEE;
+    width: 27px;
+    height: 27px;
+    margin: 0px auto;
+
+
+}
+
+.pet1 .icon {
+    display: flex;
+    align-items: center;
+    background-color: #23BDEE;
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+
+}
+
+.pet2 .icon {
+    display: flex;
+    align-items: center;
+    background-color: #F88C3D;
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+
+}
+
+.pet2 .icon .MdOutlineMail {
+    color: white;
+    font-size: 30px;
+    background: #F88C3D;
+    width: 27px;
+    height: 27px;
+    margin: 0px auto;
+
+
+}
+
+.pet3 {
+    padding: 20px 20px;
+
+}
+
+.pet3 img {
+    width: 56px;
+    height: 56px;
+}
+
+.pet3 .pet3text h1 {
+    color: #595959;
+    font-size: 18px;
+    line-height: 180%;
+}
+
+.pet3text {
+    display: flex;
+    gap: 23px;
+    font-weight: 700;
+}
+
+.pet3 button {
+    width: 180px;
+    height: 50px;
+    background-color: #D8587E;
+    color: white;
+    margin: -28px 109px;
+}
+
+
+
+/* ✅ faqat ozgina pastga-tepaga harakat */
+.mainright .pet1,
+.mainright .pet2 {
+    animation: floatCard 3.5s ease-in-out infinite;
+}
+
+
+
+/* pet2 biroz kechikib harakatlansin */
+.mainright .pet2 {
+    animation-delay: 1.5s;
+}
+
+
+@keyframes floatCard {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-84px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}

@@ -1,47 +1,28 @@
-import { Routes, Route } from "react-router-dom";
-
-import Fresh from "./Component/fresh/Fresh";
-import Header from "./Component/header/Header";
-import Main from "./Component/main/Main";
-import Mobilestore from "./Component/mobilestore/Mobilestore";
-import Section from "./Component/section/Section";
-import Sectionone from "./Component/sectionone/Sectionone";
-import Sectiontwo from "./Component/sectiontwo/Sectiontwo";
-import Footer from "./Component/footer/Footer";
-import Bestselling from "./bestSelling/Bestselling";
-import Login from "./Component/Admindonlod/Login";
-import './index.css';
-import Cart from "./Component/Componentproduct/Pages/Cart"
-import AdminPanel from "./Component/Admindonlod/AdminPanel/adminpanelone/AdminPanel"
-import Cheforder from "./Component/Admindonlod/Chefpanel/adminpanelone/AdminPanel"
-
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./Home";
+import Login from "./Register/Login/Login";
+import Courses from "./Course/Courses/Courses";
+import CourseDetail from "./Course/CourseDetail/CourseDetail";
+import AILearning from "./Course/AILearning/AILearning";
+import TeacherPanel from "./Teacher/TeacherPanel";
+import StudentMessaging from "./Student/StudentMessaging";
+import Profile from "./Profile";
+import Settings from "./Settings";
 
 export default function App() {
-
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <>
-            <Header />
-            <Main />
-            <Section />
-            <Fresh />
-            <Sectionone />
-            <Sectiontwo />
-            <Bestselling />
-            <Mobilestore />
-            <Footer />
-          </>
-        }
-      />
-
-<Route path="/login" element={<Login />} />
-<Route path="/chef" element={<Cheforder/>}/>
-<Route path="/admin" element={<AdminPanel/>} />
-
-<Route path="/cart" element={<Cart />} />
-    </Routes>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/courses" element={<Courses />} />
+        <Route path="/courses/:courseId" element={<CourseDetail />} />
+        <Route path="/ai-learning/:courseId" element={<AILearning />} />
+        <Route path="/teacher-panel" element={<TeacherPanel />} />
+        <Route path="/student-messaging" element={<StudentMessaging />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/settings" element={<Settings />} />
+      </Routes>
+    </BrowserRouter>
   );
 }

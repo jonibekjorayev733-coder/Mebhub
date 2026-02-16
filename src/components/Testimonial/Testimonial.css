@@ -1,0 +1,405 @@
+.ts {
+  background: #ffffff;
+  margin: 80px 0;
+  overflow: hidden;
+}
+
+.ts__container {
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 0 60px;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  min-height: 600px;
+}
+
+/* LEFT SECTION */
+.ts__left {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.ts__kicker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  color: #7a7fa0;
+}
+
+.ts__line {
+  width: 40px;
+  height: 2px;
+  background: #7a7fa0;
+  flex-shrink: 0;
+}
+
+.ts__title {
+  margin: 0;
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 800;
+  color: #2f2f7f;
+  line-height: 1.2;
+}
+
+.ts__content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.ts__p {
+  margin: 0;
+  max-width: 520px;
+  font-size: clamp(16px, 2.5vw, 20px);
+  line-height: 1.7;
+  color: #6b79a0;
+}
+
+.ts__btn {
+  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  border-radius: 70px;
+  border: 1px solid #5ecbe0;
+  background: transparent;
+  padding: 22px 20px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #5ecbe0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  align-self: flex-start;
+  min-height: 60px;
+}
+
+.ts__btn:hover {
+  background: #5ecbe0;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(94, 203, 224, 0.3);
+}
+
+.ts__btnText {
+  white-space: nowrap;
+}
+
+.ts__btnIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.ts__btn:hover .ts__btnIcon {
+  transform: translateX(4px);
+}
+
+/* RIGHT SECTION */
+.ts__right {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
+.ts__imageSection {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.ts__imgWrap {
+  overflow: hidden;
+  border-radius: 26px;
+  box-shadow: 0 30px 70px rgba(20, 40, 70, 0.12);
+  transition: transform 0.3s ease;
+}
+
+.ts__imgWrap:hover {
+  transform: translateY(-5px);
+}
+
+.ts__img {
+  width: 360px;
+  height: 460px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Arrow button */
+.ts__arrow {
+  position: absolute;
+  right: -29px;
+  top: 42%;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: none;
+  background: #ffffff;
+  color: #2fb4e9;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 18px 40px rgba(20, 40, 70, 0.15);
+  transition: all 0.3s ease;
+  z-index: 2;
+}
+
+.ts__arrow:hover {
+  transform: scale(1.1);
+  box-shadow: 0 25px 50px rgba(20, 40, 70, 0.2);
+}
+
+/* Quote card */
+.ts__card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  padding: 22px;
+  border-radius: 16px;
+  box-shadow: 0 24px 50px rgba(20, 40, 70, 0.12);
+  position: relative;
+}
+
+.ts__cardLine {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  border-radius: 20px 0 0 20px;
+  background: #ff7a6b;
+}
+
+.ts__quote {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  line-height: 1.7;
+  color: #6b79a0;
+}
+
+.ts__cardBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.ts__authorInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ts__name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2f2f7f;
+}
+
+.ts__rating {
+  text-align: left;
+}
+
+.ts__reviews {
+  font-size: 12px;
+  color: #8c90a4;
+}
+
+/* RESPONSIVE DESIGN */
+
+/* Large Desktop */
+@media (min-width: 1400px) {
+  .ts__container {
+    padding: 0 80px;
+    gap: 120px;
+  }
+  
+  .ts__img {
+    width: 400px;
+    height: 500px;
+  }
+}
+
+/* Desktop */
+@media (max-width: 1200px) {
+  .ts__container {
+    padding: 0 40px;
+    gap: 60px;
+  }
+  
+  .ts__img {
+    width: 320px;
+    height: 400px;
+  }
+  
+  .ts__card {
+    max-width: 380px;
+  }
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .ts {
+    margin: 60px 0;
+  }
+  
+  .ts__container {
+    grid-template-columns: 1fr;
+    gap: 50px;
+    padding: 0 30px;
+    text-align: center;
+  }
+  
+  .ts__left {
+    align-items: center;
+  }
+  
+  .ts__p {
+    max-width: 600px;
+  }
+  
+  .ts__right {
+    order: -1;
+  }
+  
+  .ts__img {
+    width: 300px;
+    height: 380px;
+  }
+  
+  .ts__arrow {
+    right: -20px;
+  }
+  
+  .ts__card {
+    max-width: 100%;
+  }
+}
+
+/* Mobile Large */
+@media (max-width: 768px) {
+  .ts {
+    margin: 40px 0;
+  }
+  
+  .ts__container {
+    padding: 0 20px;
+    gap: 40px;
+  }
+  
+  .ts__kicker {
+    font-size: 12px;
+    letter-spacing: 2px;
+  }
+  
+  .ts__line {
+    width: 30px;
+  }
+  
+  .ts__img {
+    width: 280px;
+    height: 350px;
+  }
+  
+  .ts__btn {
+    padding: 18px 24px;
+    font-size: 15px;
+    width: 100%;
+    justify-content: center;
+    max-width: 300px;
+  }
+  
+  .ts__btnIcon {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .ts__arrow {
+    width: 50px;
+    height: 50px;
+    right: -15px;
+  }
+  
+  .ts__card {
+    padding: 20px;
+  }
+  
+  .ts__quote {
+    font-size: 15px;
+  }
+  
+  .ts__name {
+    font-size: 16px;
+  }
+}
+
+/* Mobile Small */
+@media (max-width: 480px) {
+  .ts__container {
+    padding: 0 16px;
+    gap: 30px;
+  }
+  
+  .ts__img {
+    width: 250px;
+    height: 320px;
+  }
+  
+  .ts__btn {
+    padding: 16px 20px;
+    font-size: 14px;
+  }
+  
+  .ts__btnText {
+    white-space: normal;
+    text-align: center;
+    line-height: 1.3;
+  }
+  
+  .ts__arrow {
+    width: 45px;
+    height: 45px;
+    right: -10px;
+  }
+  
+  .ts__card {
+    padding: 18px;
+  }
+  
+  .ts__cardBottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+/* Mobile Extra Small */
+@media (max-width: 360px) {
+  .ts__img {
+    width: 220px;
+    height: 280px;
+  }
+  
+  .ts__card {
+    padding: 16px;
+  }
+  
+  .ts__quote {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+}
