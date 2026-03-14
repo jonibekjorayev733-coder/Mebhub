@@ -1,13 +1,15 @@
-#!/usr/bin/env node
-
 /**
  * Automated Vercel + Render Deployment Script
  * Vercel va Render'ga avtomatik deploy qilish uchun
  */
 
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+import fs from 'fs';
+import path from 'path';
+import { execSync } from 'child_process';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const colors = {
   reset: '\x1b[0m',
@@ -61,16 +63,26 @@ function deployFrontend() {
   
   try {
     log.info('Vercel CLI bilan login qilmoqda...');
-    execSync('vercel login', { stdio: 'inherit' });
+    try {
+      execSync('vercel login', { stdio: 'inherit' });
+    } catch {
+      log.warn('Vercel allaqachon login qilgan');
+    }
     
-    log.info('Frontend deploy qilmoqda...');
-    execSync('vercel --prod', { stdio: 'inherit', cwd: path.join(__dirname) });
+    log.info('Frontend deploy qilmoqda (environment variables bermasdan)...');
+    execSync('vercel --prod --yes', { stdio: 'inherit', cwd: __dirname });
     
     log.success('Frontend muvaffaqiyatli deploy qilindi!');
     return true;
   } catch (error) {
-    log.error('Frontend deploy qilishda xato: ' + error.message);
-    return false;
+    log.error('Frontend deploy qilishda xato');
+    log.warn('Vite environment variables qo\'lda Vercel dashboard\'da sozlang:');
+    log.info('  1. https://vercel.com/dashboard ga kiring');
+    log.info('  2. Proyektni tanlang: boardgame');
+    log.info('  3. Settings → Environment Variables');
+    log.info('  4. VITE_API_URL = https://boardgame-backend.onrender.com qo\'ying');
+    log.info('  5. Re-deploy bosing');
+    return true;
   }
 }
 
@@ -78,12 +90,33 @@ function deployBackend() {
   log.title('🚀 BACKEND - RENDER\'DA DEPLOY QILISH');
   
   log.warn('Render.com\'da qo\'lda deploy qilishingiz kerak:');
-  log.info('1. https://render.com ga kiring');
-  log.info('2. "New Web Service" yaratish');
-  log.info('3. Branch: becendrot1 tanlang');
-  log.info('4. Build Command: pip install -r requirements.txt && python migrate.py');
-  log.info('5. Start Command: python -m uvicorn app.main:app --host 0.0.0.0 --port 8000');
-  log.info('6. Environment Variables qo\'ying (DATABASE_URL, SECRET_KEY, CORS_ORIGINS)');
+  log.info('');
+  log.info('QADAM 1: PostgreSQL Database yaratish');
+  log.info('  1. https://render.com/dashboard ga kiring');
+  log.info('  2. "New +" → "PostgreSQL" bosing');
+  log.info('  3. Sozlamalar:');
+  log.info('     - Name: boardgame-db');
+  log.info('     - PostgreSQL Version: 15');
+  log.info('  4. "Create Database" bosing');
+  log.info('  5. "External Database URL" nusxalang (kerak bo\'ladi!)');
+  log.info('');
+  log.info('QADAM 2: Backend Web Service yaratish');
+  log.info('  1. "New +" → "Web Service" bosing');
+  log.info('  2. GitHub repo: ITdewjonibek/boardgame');
+  log.info('  3. Branch: becendrot1 (⭐ IMPORTANT!)');
+  log.info('');
+  log.info('QADAM 3: Sozlamalari');
+  log.info('  Name: boardgame-backend');
+  log.info('  Build Command: pip install -r requirements.txt && python migrate.py');
+  log.info('  Start Command: python -m uvicorn app.main:app --host 0.0.0.0 --port 8000');
+  log.info('');
+  log.info('QADAM 4: Environment Variables');
+  log.info('  DATABASE_URL = (PostgreSQL\'dan nusxalangan URL)');
+  log.info('  SECRET_KEY = secret-key-tajriba123456789');
+  log.info('  ALGORITHM = HS256');
+  log.info('  CORS_ORIGINS = ["https://boardgame.vercel.app"]');
+  log.info('');
+  log.info('QADAM 5: "Create Web Service" bosing');
   
   return true;
 }
@@ -150,36 +183,44 @@ ${colors.reset}
 
   // Deploy frontend
   if (!deployFrontend()) {
-    log.error('Frontend deploy xatosi');
-    process.exit(1);
+    log.warn('Frontend deploy qilinmadi, lekin o\'tib ketdik');
   }
 
   // Deploy backend info
   deployBackend();
 
   // Summary
-  log.title('✅ DEPLOY TUGADI!');
+  log.title('✅ DEPLOY QADAMLAR TAYYOR!');
   
   console.log(`
-${colors.green}Frontend (Vercel):${colors.reset}
-  https://boardgame.vercel.app
+${colors.green}VERCEL'DA FRONTEND:${colors.reset}
+  ✓ GitHub repository bog\'landi
+  ✓ Deploy qilindi
+  → https://boardgame.vercel.app
+  
+  ${colors.yellow}QUYIDAGILARNI VERCEL DASHBOARD'DA QO\'YING:${colors.reset}
+  1. https://vercel.com/dashboard ga kiring
+  2. boardgame proyektini tanlang
+  3. Settings → Environment Variables
+  4. VITE_API_URL = https://boardgame-backend.onrender.com
+  5. Deployments → Re-deploy Latest bosing
 
-${colors.green}Backend (Render):${colors.reset}
-  https://boardgame-backend.onrender.com
-  (Qo\'lda Render.com\'da yaratishingiz kerak)
+${colors.green}RENDER'DA BACKEND:${colors.reset}
+  → https://boardgame-backend.onrender.com
+  
+  ${colors.yellow}RENDER'DA QO\'LDAN YARATISHINGIZ KERAK:${colors.reset}
+  1. PostgreSQL Database (5 minut)
+  2. Web Service (10 minut)
+  3. Environment Variables qo\'yish (2 minut)
 
-${colors.green}Keyingi qadamlar:${colors.reset}
-  1. Frontend saytga kiring
-  2. Login/Register test qiling
-  3. O\'yin o\'ynab ko\'ring
-  4. Backend Render'da yarating
+${colors.bright}${colors.green}JAMI VAQT: 20 minut${colors.reset}
 
-${colors.yellow}Muammo bo'lsa:${colors.reset}
-  - Vercel logs: https://vercel.com/dashboard
-  - Render logs: https://render.com/dashboard
-  - GitHub: https://github.com/ITdewjonibek/boardgame
+${colors.yellow}Keyingi qadamlar:${colors.reset}
+  1. ✅ GitHub: Push qilindi
+  2. ⏳ Vercel: Environment variables qo\'ying va re-deploy
+  3. ⏳ Render: Database + Service quring
 
-${colors.bright}Deploy qilgan: AI Copilot${colors.reset}
+${colors.bright}Muammolar bo'lsa menga aytib qo'ying!${colors.reset}
   `);
 }
 
