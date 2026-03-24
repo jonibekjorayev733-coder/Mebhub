@@ -24,3 +24,42 @@ dist-ssr
 *.sw?
 
 .vercel
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+test.db
+
+# Env files
+.env
+.env.local
+.env.*.local
+
+# Backend folder (optional - if you want to exclude entire backend)
+# backend/

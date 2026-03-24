@@ -125,7 +125,13 @@ def register(data: TeacherRegister):
         return TokenResponse(
             access_token=access_token,
             token_type="bearer",
-            teacher=TeacherResponse.from_orm(teacher)
+            teacher=TeacherResponse(
+                id=teacher.id,
+                username=teacher.username,
+                email=teacher.email,
+                full_name=teacher.full_name,
+                is_active=teacher.is_active
+            )
         )
     finally:
         db.close()
