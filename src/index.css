@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Orbitron:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,148 +6,243 @@
 
 @layer base {
   :root {
-    --background: 230 50% 4%;
+    --background: 240 10% 2%;
     --foreground: 210 40% 98%;
-    
-    --card: 230 40% 7%;
+    --card: 240 5% 4%;
     --card-foreground: 210 40% 98%;
- 
-    --popover: 230 40% 7%;
+    --popover: 240 5% 4%;
     --popover-foreground: 210 40% 98%;
- 
-    --primary: 187 100% 50%;
-    --primary-foreground: 187 100% 10%;
- 
-    --secondary: 260 80% 60%;
+    --primary: 173 80% 50%;
+    --primary-foreground: 180 100% 5%;
+    --secondary: 280 100% 65%;
     --secondary-foreground: 210 40% 98%;
- 
-    --muted: 230 20% 15%;
+    --muted: 240 5% 12%;
     --muted-foreground: 215 20% 65%;
- 
-    --accent: 187 100% 50%;
+    --accent: 173 80% 50%;
     --accent-foreground: 210 40% 98%;
- 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
-
-    --border: 230 20% 15%;
-    --input: 230 20% 15%;
-    --ring: 187 100% 50%;
- 
-    --radius: 1rem;
-
-    --neon-cyan: 187 100% 50%;
-    --neon-magenta: 300 100% 50%;
-    --neon-green: 145 100% 50%;
-    --neon-yellow: 55 100% 50%;
-    --neon-orange: 25 100% 50%;
+    --border: 240 5% 15%;
+    --input: 240 5% 15%;
+    --ring: 173 80% 50%;
+    --radius: 1.5rem;
+    --neon-cyan: 173 80% 55%;
+    --neon-magenta: 300 100% 65%;
+    --neon-amber: 38 100% 55%;
   }
 
   * {
-    @apply border-border selection:bg-primary/30 selection:text-white;
+    @apply border-border selection:bg-cyan-500/40 selection:text-white;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
   }
 
   body {
-    @apply bg-background text-foreground antialiased min-h-screen;
-    font-family: 'Rajdhani', 'Plus Jakarta Sans', sans-serif;
-    background-image: 
-      radial-gradient(circle at 0% 0%, hsla(187, 100%, 50%, 0.05) 0%, transparent 50%),
-      radial-gradient(circle at 100% 0%, hsla(260, 80%, 60%, 0.05) 0%, transparent 50%),
-      radial-gradient(circle at 50% 100%, hsla(300, 100%, 50%, 0.03) 0%, transparent 50%);
-    background-attachment: fixed;
+    @apply bg-ultra-bg text-foreground antialiased min-h-screen overflow-x-hidden;
+    font-family: 'Plus Jakarta Sans', 'Rajdhani', sans-serif;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-display tracking-tight;
+  h1, h2, h3, .font-display {
+    font-family: 'Orbitron', sans-serif;
+  }
+
+  /* Qora fon + oq shadow — premium mesh */
+  .mesh-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -20;
+    background: 
+      radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 80%, rgba(255,255,255,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.02) 0%, transparent 60%),
+      #0a0a0a;
+    background-attachment: fixed;
+    animation: mesh-drift 25s ease-in-out infinite;
+  }
+
+  .mesh-bg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: 
+      linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.3) 100%),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  @keyframes mesh-drift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  /* Oq shadow grid overlay */
+  .grid-overlay {
+    background-image: 
+      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  .ether-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -10;
+    background: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.08) 0%, transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(255,255,255,0.06) 0%, transparent 40%),
+      radial-gradient(circle at 50% 50%, rgba(255,255,255,0.03) 0%, transparent 50%);
+    @apply animate-ether;
+    background-size: 200% 200%;
+  }
+
+  .ether-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.02;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+
+  /* Oq shadow — kartochkalar uchun */
+  .white-glow {
+    box-shadow: 0 0 40px -10px rgba(255,255,255,0.15), 0 0 80px -20px rgba(255,255,255,0.08), inset 0 1px 0 0 rgba(255,255,255,0.06);
+  }
+
+  .white-glow:hover {
+    box-shadow: 0 0 60px -10px rgba(255,255,255,0.25), 0 0 100px -20px rgba(255,255,255,0.12), inset 0 1px 0 0 rgba(255,255,255,0.1);
   }
 }
 
 @layer components {
-  .glass-card {
-    @apply relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl shadow-2xl transition-all duration-300;
-  }
 
-  .glass-card::before {
-    content: '';
-    @apply absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 transition-opacity duration-300;
+  /* Premium Glass Card — qora + oq shadow */
+  .glass-card {
+    @apply relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-xl transition-all duration-500;
+    box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.08), 0 25px 50px -12px rgba(0,0,0,0.6), 0 0 30px -10px rgba(255,255,255,0.05);
   }
 
   .glass-card:hover {
-    @apply border-white/20 -translate-y-1;
+    @apply border-white/20 bg-white/[0.05] -translate-y-1;
+    box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.12), 
+      0 0 50px -10px rgba(255,255,255,0.2),
+      0 0 100px -20px rgba(255,255,255,0.1),
+      0 30px 60px -15px rgba(0,0,0,0.7);
   }
 
-  .glass-card:hover::before {
+  /* Obsidian Glass — oq shadow */
+  .obsidian-glass {
+    @apply relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-3xl transition-all duration-700;
+    box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.08), 0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px -5px rgba(255,255,255,0.04);
+  }
+
+  .obsidian-glass::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-br from-white/[0.1] to-transparent opacity-0 transition-opacity duration-700;
+  }
+
+  .obsidian-glass:hover {
+    @apply border-white/20 bg-white/[0.05] -translate-y-2;
+    box-shadow: inset 0 1px 2px 0 rgba(255, 255, 255, 0.12), 0 0 40px -10px rgba(255,255,255,0.15), 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+  }
+
+  .obsidian-glass:hover::before {
     @apply opacity-100;
   }
 
-  .btn-premium {
-    @apply relative inline-flex items-center justify-center px-8 py-3 font-display font-bold text-sm tracking-widest uppercase transition-all duration-300 rounded-lg overflow-hidden;
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
-    color: white;
-    box-shadow: 0 0 20px hsla(var(--primary), 0.3);
+  /* Neon glow button — oq shadow */
+  .btn-neon {
+    @apply relative inline-flex items-center justify-center px-8 py-3 font-bold rounded-xl overflow-hidden transition-all duration-300 active:scale-[0.98];
+    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+    color: #0a0a0a;
+    box-shadow: 0 0 30px -5px rgba(255,255,255,0.4), inset 0 1px 0 0 rgba(255,255,255,0.5);
   }
 
-  .btn-premium:hover {
-    @apply -translate-y-0.5 scale-105;
-    box-shadow: 0 0 30px hsla(var(--primary), 0.5);
+  .btn-neon:hover {
+    box-shadow: 0 0 50px -5px rgba(255,255,255,0.6), 0 0 80px -15px rgba(255,255,255,0.2), inset 0 1px 0 0 rgba(255,255,255,0.6);
   }
 
-  .btn-premium::after {
+  /* Ultra Kinetic Button — oq shadow */
+  .btn-ultra {
+    @apply relative inline-flex items-center justify-center px-10 py-4 font-display font-black text-xs tracking-[0.2em] uppercase transition-all duration-500 rounded-xl overflow-hidden active:scale-95;
+    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%);
+    color: #0a0a0a;
+    box-shadow: 0 0 30px -5px rgba(255,255,255,0.35), inset 0 1px 0 0 rgba(255,255,255,0.5);
+  }
+
+  .btn-ultra:hover {
+    @apply -translate-y-1 scale-105;
+    box-shadow: 0 0 50px -5px rgba(255,255,255,0.5), 0 0 80px -15px rgba(255,255,255,0.15), inset 0 1px 0 0 rgba(255,255,255,0.6);
+  }
+
+  .btn-ultra::after {
     content: '';
-    @apply absolute inset-0 bg-white/20 translate-x-[-100%] transition-transform duration-500 skew-x-[-20deg];
+    @apply absolute inset-0 bg-white/30 -translate-x-[150%] skew-x-[-20deg] transition-transform duration-700;
   }
 
-  .btn-premium:hover::after {
-    @apply translate-x-[100%];
+  .btn-ultra:hover::after {
+    @apply translate-x-[150%];
   }
 
-  .input-premium {
-    @apply w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all duration-300 backdrop-blur-md;
+  /* Gradient text — oq nurli */
+  .text-ultra-gradient {
+    @apply bg-clip-text text-transparent;
+    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0.9) 100%);
+    background-size: 200% auto;
+    @apply animate-ether;
+    text-shadow: 0 0 60px rgba(255,255,255,0.3);
   }
 
-  .neon-text {
-    @apply text-primary drop-shadow-[0_0_8px_hsla(var(--primary),0.8)];
+  /* Floating animation for decorative elements */
+  .float-slow {
+    animation: float 6s ease-in-out infinite;
   }
 
-  .neon-border {
-    @apply border-primary shadow-[0_0_15px_hsla(var(--primary),0.3)];
+  .float-medium {
+    animation: float 4s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+
+  /* Glow pulse */
+  .glow-pulse {
+    animation: glow-pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% { opacity: 0.6; filter: blur(40px); }
+    50% { opacity: 1; filter: blur(50px); }
   }
 }
 
-@layer utilities {
-  .text-gradient {
-    @apply bg-gradient-to-r from-primary via-white to-secondary bg-clip-text text-transparent;
-  }
-
-  .mesh-bg {
-    background: 
-      radial-gradient(at 10% 20%, hsla(187, 100%, 50%, 0.1) 0px, transparent 50%),
-      radial-gradient(at 80% 10%, hsla(260, 80%, 60%, 0.1) 0px, transparent 50%),
-      radial-gradient(at 40% 80%, hsla(300, 100%, 50%, 0.1) 0px, transparent 50%),
-      radial-gradient(at 90% 90%, hsla(145, 100%, 50%, 0.1) 0px, transparent 50%);
-  }
+/* Global Transition Override */
+* {
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-/* Animations */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+/* Custom Scrollbar for Ultra Feel */
+::-webkit-scrollbar {
+  width: 6px;
 }
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+::-webkit-scrollbar-track {
+  @apply bg-ultra-bg;
 }
 
-@keyframes pulse-glow {
-  0%, 100% { opacity: 0.5; filter: blur(20px); }
-  50% { opacity: 0.8; filter: blur(30px); }
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-600 rounded-full hover:bg-white/40 transition-colors;
 }
 
-.glow-overlay {
-  @apply absolute pointer-events-none;
-  background: radial-gradient(circle, hsla(var(--primary), 0.2) 0%, transparent 70%);
-  animation: pulse-glow 4s ease-in-out infinite;
+/* Scroll Snap for Pages */
+.scroll-snap-area {
+  scroll-snap-type: y proximity;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.scroll-snap-item {
+  scroll-snap-align: start;
 }

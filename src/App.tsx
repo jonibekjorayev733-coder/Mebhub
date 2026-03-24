@@ -1,82 +1,66 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import Layout from "@/components/Layout";
 import Home from "@/pages/Home";
 import Login from "@/pages/Login";
-import AddTest from "@/pages/AddTest";
-import PlayerProfile from "@/pages/PlayerProfile";
+import Games from "@/pages/Games";
 import Leaderboard from "@/pages/Leaderboard";
-import WheelGame from "@/pages/games/WheelGame";
-import BarabanGame from "@/pages/games/BarabanGame";
-import MemoryGame from "@/pages/games/MemoryGame";
-import QuizGame from "@/pages/games/QuizGame";
-import MathGame from "@/pages/games/MathGame";
-import WordGame from "@/pages/games/WordGame";
-import MillionaireGame from "@/pages/games/MillionaireGame";
-import TugOfWarGame from "@/pages/games/TugOfWarGame";
-import WordSearchGame from "@/pages/games/WordSearchGame";
-import CountryGame from "@/pages/games/CountryGame";
-import ChampionGame from "@/pages/games/ChampionGame";
-import SpeedRoundGame from "@/pages/games/SpeedRoundGame";
-import CrosswordGame from "@/pages/games/CrosswordGame";
-import BiggestGame from "@/pages/games/BiggestGame";
-import DuelGame from "@/pages/games/DuelGame";
-import ChainGame from "@/pages/games/ChainGame";
-import CosmicQuiz from "@/pages/games/CosmicQuiz";
-import MolecularLab from "@/pages/games/MolecularLab";
-import BattleOfWits from "@/pages/games/BattleOfWits";
-import VerbalQuest from "@/pages/games/VerbalQuest";
-import LogicMaster from "@/pages/games/LogicMaster";
-import PuzzleGame from "@/pages/games/PuzzleGame";
-import WordChainGame from "@/pages/games/WordChainGame";
+import PlayerProfile from "@/pages/PlayerProfile";
 import NotFound from "@/pages/NotFound";
-import TestManager from "@/pages/admin/TestManager";
+import TeacherAuth from "@/pages/TeacherAuth";
+import TeacherPanelPro from "@/pages/TeacherPanelPro";
+import TeacherDashboard from "@/pages/TeacherDashboard";
+import BarabanGameV2 from "@/pages/games/BarabanGameV2";
+import MillionaireGameV2 from "@/pages/games/MillionaireGameV2";
+import WordSearchGameV2 from "@/pages/games/WordSearchGameV2";
+import HiddenHourglassGameV2 from "@/pages/games/HiddenHourglassGameV2";
+import DavlatniTopishGameV2 from "@/pages/games/DavlatniTopishGameV2";
+import ShumodOyiniGameV2 from "@/pages/games/ShumodOyiniGameV2";
+import KrosswordGame from "@/pages/games/KrosswordGame";
+import ArqonTortishGame from "@/pages/games/ArqonTortishGame";
+import BilimliOquvchi from "@/pages/games/BilimliOquvchi";
+import TarixniQilishGame from "@/pages/games/TarixniQilishGame";
+import TemurConquestGame from "@/pages/games/TemurConquestGame";
+import TemurConquestGameV2 from "@/pages/games/TemurConquestGameV2";
 import { Toaster } from "sonner";
 import "./index.css";
 
 function App() {
   return (
-    <AuthProvider>
-      <Toaster theme="dark" position="top-center" richColors />
-      <BrowserRouter future={{
-        v7_startTransition: true,
-        v7_relativeSplatPath: true,
-      }}>
-        <Routes>
-          <Route path="/" element={<Layout><Home /></Layout>} />
-          <Route path="/login" element={<Layout><Login /></Layout>} />
-          <Route path="/add-test" element={<Layout><AddTest /></Layout>} />
-          <Route path="/profile" element={<Layout><PlayerProfile /></Layout>} />
-          <Route path="/leaderboard" element={<Layout><Leaderboard /></Layout>} />
-          <Route path="/test-manager" element={<Layout><TestManager /></Layout>} />
-          <Route path="/games" element={<Navigate to="/" replace />} />
-          <Route path="/games/wheel" element={<Layout><WheelGame /></Layout>} />
-          <Route path="/games/baraban" element={<Layout><BarabanGame /></Layout>} />
-          <Route path="/games/memory" element={<Layout><MemoryGame /></Layout>} />
-          <Route path="/games/quiz" element={<Layout><QuizGame /></Layout>} />
-          <Route path="/games/math" element={<Layout><MathGame /></Layout>} />
-          <Route path="/games/word" element={<Layout><WordGame /></Layout>} />
-          <Route path="/games/millionaire" element={<Layout><MillionaireGame /></Layout>} />
-          <Route path="/games/tug-of-war" element={<Layout><TugOfWarGame /></Layout>} />
-          <Route path="/games/word-search" element={<Layout><WordSearchGame /></Layout>} />
-          <Route path="/games/country" element={<Layout><CountryGame /></Layout>} />
-          <Route path="/games/champion" element={<Layout><ChampionGame /></Layout>} />
-          <Route path="/games/speed-round" element={<Layout><SpeedRoundGame /></Layout>} />
-          <Route path="/games/crossword" element={<Layout><CrosswordGame /></Layout>} />
-          <Route path="/games/biggest" element={<Layout><BiggestGame /></Layout>} />
-          <Route path="/games/duel" element={<Layout><DuelGame /></Layout>} />
-          <Route path="/games/chain" element={<Layout><ChainGame /></Layout>} />
-          <Route path="/games/cosmic-quiz" element={<Layout><CosmicQuiz /></Layout>} />
-          <Route path="/games/molecular-lab" element={<Layout><MolecularLab /></Layout>} />
-          <Route path="/games/battle-of-wits" element={<Layout><BattleOfWits /></Layout>} />
-          <Route path="/games/verbal-quest" element={<Layout><VerbalQuest /></Layout>} />
-          <Route path="/games/logic-master" element={<Layout><LogicMaster /></Layout>} />
-          <Route path="/games/puzzle" element={<Layout><PuzzleGame /></Layout>} />
-          <Route path="/games/word-chain" element={<Layout><WordChainGame /></Layout>} />
-          <Route path="*" element={<Layout><NotFound /></Layout>} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Toaster theme="dark" position="top-center" richColors />
+        <BrowserRouter future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}>
+          <Routes>
+            <Route path="/" element={<Layout><Home /></Layout>} />
+            <Route path="/login" element={<Layout><Login /></Layout>} />
+            <Route path="/teacher/auth" element={<TeacherAuth />} />
+            <Route path="/teacher/panel" element={<TeacherPanelPro />} />
+            <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
+            <Route path="/games" element={<Layout><Games /></Layout>} />
+            <Route path="/games/baraban" element={<Layout><BarabanGameV2 /></Layout>} />
+            <Route path="/games/millionaire" element={<Layout><MillionaireGameV2 /></Layout>} />
+            <Route path="/games/word-search" element={<Layout><WordSearchGameV2 /></Layout>} />
+            <Route path="/games/davlatni-topish" element={<Layout><DavlatniTopishGameV2 /></Layout>} />
+            <Route path="/games/shumod" element={<Layout><ShumodOyiniGameV2 /></Layout>} />
+            <Route path="/games/krossword" element={<Layout><KrosswordGame /></Layout>} />
+            <Route path="/games/arqon-tortish" element={<Layout><ArqonTortishGame /></Layout>} />
+            <Route path="/games/chempion" element={<Layout><BilimliOquvchi /></Layout>} />
+            <Route path="/games/tarix" element={<Layout><TarixniQilishGame /></Layout>} />
+            <Route path="/games/hidden-hourglass" element={<Layout><HiddenHourglassGameV2 /></Layout>} />
+            <Route path="/games/temur-conquest" element={<Layout><TemurConquestGame /></Layout>} />
+            <Route path="/games/temur-conquest-v2" element={<Layout><TemurConquestGameV2 /></Layout>} />
+            <Route path="/leaderboard" element={<Layout><Leaderboard /></Layout>} />
+            <Route path="/profile" element={<Layout><PlayerProfile /></Layout>} />
+            <Route path="*" element={<Layout><NotFound /></Layout>} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

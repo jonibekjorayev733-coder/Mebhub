@@ -43,23 +43,14 @@ async def get_game_questions(
 ):
     """Fetch questions for a game, optionally filtered by section"""
     query = db.query(GameQuestion).filter(
-        GameQuestion.game_name == game_name,
+        GameQuestion.game_id == game_name,
         GameQuestion.difficulty == difficulty
     )
-    if section is not None:
-        query = query.filter(GameQuestion.section_number == section)
+    # Remove section filter since the model doesn't have section_number field
+    # if section is not None:
+    #     query = query.filter(GameQuestion.section_number == section)
 
-    db_questions = query.order_by(GameQuestion.section_number, GameQuestion.id).all()
-
-    if not db_questions:
-        if game_name == "physics" and section is None:
-            if difficulty == "Oson": questions = PHYSICS_QUESTIONS[:10]
-            elif difficulty == "O'rta": questions = PHYSICS_QUESTIONS[10:15]
-            else: questions = PHYSICS_QUESTIONS[15:]
-            return [{"id": i, "q": q["q"], "opts": q["opts"], "correct": q["correct"],
-                     "formula": q.get("formula", ""), "explanation": q.get("exp", ""), "section_number": 1}
-                    for i, q in enumerate(questions)]
-        return []
+    db_questions = query.order_by(GameQuestion.order_index).all()
 
     return [
         {
@@ -67,8 +58,9 @@ async def get_game_questions(
             "q": q.question_text,
             "opts": q.options,
             "correct": q.correct_answer,
-            "formula": q.formula or "",
-            "explanation": q.explanation or ""
+            "difficulty": q.difficulty,
+            "explanation": q.explanation or "",
+            "points": q.points
         }
         for q in db_questions
     ]

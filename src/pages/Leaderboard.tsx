@@ -1,123 +1,177 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Activity, Medal, Star, Cpu, Network, Shield } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Medal, Flame, Star } from "lucide-react";
 
-// Mock Data for now - eventually fetched from API
-const MOCK_LEADERBOARD = [
-    { id: '1', name: 'NEO_SYNC', rank: 'Apex', score: 2540000, combo: 120 },
-    { id: '2', name: 'CYBER_GHOST', rank: 'GrandMaster', score: 980500, combo: 85 },
-    { id: '3', name: 'VOID_WALKER', rank: 'Master', score: 450200, combo: 64 },
-    { id: '4', name: 'PROTOCOL_X', rank: 'Master', score: 320100, combo: 55 },
-    { id: '5', name: 'DATA_MINER', rank: 'Expert', score: 120000, combo: 40 },
-    { id: '6', name: 'ROOKIE_99', rank: 'Challenger', score: 45000, combo: 22 },
+interface LeaderboardPlayer {
+  rank: number;
+  name: string;
+  score: number;
+  games: number;
+  avatar: string;
+}
+
+const topPlayers: LeaderboardPlayer[] = [
+  { rank: 1, name: "Ali Karimov", score: 5230, games: 45, avatar: "👨‍🎓" },
+  { rank: 2, name: "Dilnoza Xolmirzayeva", score: 4890, games: 42, avatar: "👩‍🎓" },
+  { rank: 3, name: "Javohir Akmalov", score: 4650, games: 38, avatar: "👨‍🎓" },
+  { rank: 4, name: "Mushtariy Abdullayeva", score: 4320, games: 35, avatar: "👩‍🎓" },
+  { rank: 5, name: "Oybek Rahimov", score: 4100, games: 33, avatar: "👨‍🎓" },
+  { rank: 6, name: "Shaxnoza Iskandarova", score: 3890, games: 30, avatar: "👩‍🎓" },
+  { rank: 7, name: "Mirjalol Shodmonov", score: 3650, games: 28, avatar: "👨‍🎓" },
+  { rank: 8, name: "Nodira Xudoyberdiyeva", score: 3420, games: 26, avatar: "👩‍🎓" },
+  { rank: 9, name: "Rustam Hasanov", score: 3210, games: 24, avatar: "👨‍🎓" },
+  { rank: 10, name: "Gulnora Abdullayeva", score: 2980, games: 22, avatar: "👩‍🎓" },
 ];
 
 export default function Leaderboard() {
-    const [filter, setFilter] = useState<'global' | 'friends'>('global');
+  const topThree = topPlayers.slice(0, 3);
 
-    return (
-        <div className="min-h-screen bg-[#020617] text-white p-6 lg:p-12 overflow-hidden relative">
-            {/* Background */}
-            <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-secondary/10 rounded-full blur-[150px] opacity-30 mix-blend-screen pointer-events-none" />
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950 relative overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-600/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-orange-600/20 rounded-full blur-3xl" />
+      </div>
 
-            <div className="max-w-6xl mx-auto relative z-10 flex flex-col gap-12">
-                {/* Header */}
-                <header className="flex justify-between items-center">
-                    <div>
-                        <h1 className="text-5xl font-display font-black tracking-tighter uppercase italic mb-2">Global Hierarchy</h1>
-                        <span className="text-[12px] font-black tracking-[0.5em] text-white/40 uppercase">Top Tier Operatives</span>
-                    </div>
-                    <Link to="/" className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors">
-                        <Activity className="w-6 h-6 text-white" />
-                    </Link>
-                </header>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-gradient-to-r from-yellow-600/30 to-orange-600/30 border border-yellow-500/30 mb-6">
+            <Flame className="w-5 h-5 text-yellow-400" />
+            <span className="text-yellow-400 font-semibold">TOP O'YINCHILAR</span>
+          </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    {/* Podium (Top 3) */}
-                    <div className="lg:col-span-4 flex flex-col gap-6">
-                        <div className="flex gap-4 p-2 bg-white/5 rounded-2xl border border-white/10 w-fit">
-                            <button
-                                onClick={() => setFilter('global')}
-                                className={`px-6 py-2 rounded-xl text-sm font-black tracking-widest uppercase transition-all ${filter === 'global' ? 'bg-primary text-black' : 'text-white/40 hover:text-white'}`}
-                            >
-                                Global
-                            </button>
-                            <button
-                                onClick={() => setFilter('friends')}
-                                className={`px-6 py-2 rounded-xl text-sm font-black tracking-widest uppercase transition-all ${filter === 'friends' ? 'bg-secondary text-black' : 'text-white/40 hover:text-white'}`}
-                            >
-                                Friends
-                            </button>
-                        </div>
-
-                        <div className="glass-card bg-primary/5 border border-primary/20 rounded-[3rem] p-8 flex flex-col gap-8 relative overflow-hidden">
-                            <Cpu className="w-64 h-64 text-primary absolute -right-10 -bottom-10 opacity-5" />
-
-                            <div className="flex items-center gap-4">
-                                <Trophy className="w-8 h-8 text-primary" />
-                                <h2 className="text-2xl font-display font-black italic tracking-widest uppercase text-white">The Apex</h2>
-                            </div>
-
-                            <div className="flex flex-col gap-6">
-                                {MOCK_LEADERBOARD.slice(0, 3).map((player, index) => (
-                                    <div key={player.id} className="p-6 rounded-3xl bg-black/40 border border-white/10 flex flex-col gap-3 relative overflow-hidden group">
-                                        {index === 0 && <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent opacity-50" />}
-                                        <div className="flex justify-between items-start relative z-10">
-                                            <div className="flex items-center gap-4">
-                                                <span className={`text-4xl font-display font-black italic tracking-tighter ${index === 0 ? 'text-primary' : index === 1 ? 'text-white/80' : 'text-orange-400'}`}>
-                                                    0{index + 1}
-                                                </span>
-                                                <div className="flex flex-col">
-                                                    <span className="text-lg font-black tracking-widest text-white uppercase">{player.name}</span>
-                                                    <span className="text-[10px] font-black tracking-widest uppercase text-white/40">{player.rank}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="pt-3 border-t border-white/10 flex justify-between relative z-10">
-                                            <span className="text-xs font-mono text-white/50 tracking-widest">SCORE</span>
-                                            <span className="text-sm font-display font-black text-white italic">{player.score.toLocaleString()}</span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Full List */}
-                    <div className="lg:col-span-8 glass-card bg-[#020617]/50 border border-white/10 rounded-[3rem] p-8 lg:p-12 relative overflow-hidden">
-                        <Network className="w-[500px] h-[500px] text-white absolute -top-40 -right-40 opacity-[0.02]" />
-
-                        <div className="flex items-center gap-4 mb-8 border-b border-white/10 pb-6">
-                            <Shield className="w-6 h-6 text-white/40" />
-                            <h3 className="text-sm font-black tracking-[0.4em] uppercase text-white/40">Full Server Roster</h3>
-                        </div>
-
-                        <div className="flex flex-col gap-4 relative z-10">
-                            {/* Table Header */}
-                            <div className="grid grid-cols-12 gap-4 px-6 text-[10px] font-black tracking-widest text-white/30 uppercase mb-2">
-                                <div className="col-span-1">#</div>
-                                <div className="col-span-4">Operative</div>
-                                <div className="col-span-3">Tier</div>
-                                <div className="col-span-2 text-right">Max Combo</div>
-                                <div className="col-span-2 text-right">Net Score</div>
-                            </div>
-
-                            {/* Table Rows */}
-                            {MOCK_LEADERBOARD.map((player, index) => (
-                                <div key={player.id} className="grid grid-cols-12 gap-4 items-center p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-                                    <div className="col-span-1 text-white/50 font-display font-black italic">{index + 1}</div>
-                                    <div className="col-span-4 font-black tracking-widest text-white">{player.name}</div>
-                                    <div className="col-span-3 text-xs font-black tracking-widest uppercase text-secondary">{player.rank}</div>
-                                    <div className="col-span-2 text-right text-orange-400 font-display italic">x{player.combo}</div>
-                                    <div className="col-span-2 text-right font-display font-black italic text-white">{player.score.toLocaleString()}</div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </div>
+          <h1 className="text-6xl sm:text-7xl font-black text-white mb-4">
+            Reytingi <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">Toplamasi</span>
+          </h1>
+          
+          <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+            Eng yaxshi o'yinchilarni ko'ring va ularga qo'shiling. Har qanday o'yinda qatnashing va ko'proq ball topladon!
+          </p>
         </div>
-    );
+
+        {/* Top 3 Podium */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+          {/* 2nd Place */}
+          {topThree[1] && (
+            <div className="group">
+              <div className="bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl border border-slate-600 p-8 h-full hover:border-slate-400 transition-all duration-300">
+                <div className="text-center space-y-4">
+                  <div className="inline-block relative">
+                    <div className="text-6xl mb-2">{topThree[1].avatar}</div>
+                    <div className="absolute -top-2 -right-2 bg-slate-400 text-black font-bold w-8 h-8 rounded-full flex items-center justify-center text-sm">
+                      <Medal className="w-5 h-5" />
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white">{topThree[1].name}</h3>
+                    <p className="text-slate-400 text-sm">{topThree[1].games} o'yin</p>
+                  </div>
+                  <div className="bg-slate-700/50 rounded-lg p-3">
+                    <p className="text-slate-300 text-sm">Ballar</p>
+                    <p className="text-2xl font-black text-slate-200">{topThree[1].score.toLocaleString()}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 1st Place (Center & Larger) */}
+          {topThree[0] && (
+            <div className="group md:order-2">
+              <div className="bg-gradient-to-br from-yellow-500/30 to-orange-500/30 rounded-3xl border-2 border-yellow-400 p-8 h-full hover:shadow-2xl hover:shadow-yellow-400/30 transition-all duration-300 transform md:scale-110 md:-mt-8">
+                <div className="text-center space-y-4">
+                  <div className="inline-block relative">
+                    <div className="text-7xl mb-2 animate-bounce">{topThree[0].avatar}</div>
+                    <div className="absolute -top-4 -right-4 bg-yellow-300 text-black font-bold w-12 h-12 rounded-full flex items-center justify-center text-lg animate-pulse">
+                      <Star className="w-6 h-6 text-yellow-600 fill-yellow-600" />
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-white">{topThree[0].name}</h3>
+                    <p className="text-yellow-300 text-sm font-semibold">{topThree[0].games} o'yin</p>
+                  </div>
+                  <div className="bg-gradient-to-r from-yellow-500/50 to-orange-500/50 rounded-lg p-4 border border-yellow-400/30">
+                    <p className="text-yellow-200 text-sm font-semibold">Yuqori Ball</p>
+                    <p className="text-3xl font-black text-yellow-300">{topThree[0].score.toLocaleString()}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 3rd Place */}
+          {topThree[2] && (
+            <div className="group">
+              <div className="bg-gradient-to-br from-orange-600/20 to-yellow-600/20 rounded-2xl border border-orange-400/30 p-8 h-full hover:border-orange-400 transition-all duration-300">
+                <div className="text-center space-y-4">
+                  <div className="inline-block relative">
+                    <div className="text-6xl mb-2">{topThree[2].avatar}</div>
+                    <div className="absolute -top-2 -right-2 bg-orange-400 text-black font-bold w-8 h-8 rounded-full flex items-center justify-center text-sm">
+                      🥉
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white">{topThree[2].name}</h3>
+                    <p className="text-slate-400 text-sm">{topThree[2].games} o'yin</p>
+                  </div>
+                  <div className="bg-orange-700/30 rounded-lg p-3 border border-orange-400/20">
+                    <p className="text-slate-300 text-sm">Ballar</p>
+                    <p className="text-2xl font-black text-orange-300">{topThree[2].score.toLocaleString()}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Full Rankings Table */}
+        <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <Medal className="w-6 h-6 text-yellow-400" />
+              <div>
+                <CardTitle className="text-white text-2xl">Butun Reytingi</CardTitle>
+                <CardDescription className="text-slate-400">10 ta eng yaxshi o'yinchi</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {topPlayers.map((player) => (
+                <div
+                  key={player.rank}
+                  className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-slate-700/50 to-slate-800/50 border border-slate-600/50 hover:border-yellow-500/50 transition-all duration-300 group hover:shadow-lg hover:shadow-yellow-500/20"
+                >
+                  <div className="flex items-center gap-4 flex-1">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 font-bold text-white text-sm">
+                      {player.rank}
+                    </div>
+                    <span className="text-2xl">{player.avatar}</span>
+                    <div className="flex-1">
+                      <p className="font-bold text-white group-hover:text-yellow-300 transition-colors">{player.name}</p>
+                      <p className="text-slate-400 text-sm">{player.games} o'yinda qatnashgan</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-6">
+                    {player.rank <= 3 && (
+                      <div className="flex items-center gap-2">
+                        <Medal className="w-5 h-5 text-yellow-400" />
+                        <span className="font-bold text-yellow-400">TOP</span>
+                      </div>
+                    )}
+                    <div className="text-right">
+                      <p className="text-xl font-black text-yellow-400">{player.score.toLocaleString()}</p>
+                      <p className="text-slate-400 text-xs">ball</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
 }

@@ -1,63 +1,73 @@
-# TestPlay - O'quv o'yinlari platformasi
+# 🎯 O'z Game Platform - Boshlang'ich Setup
 
-## Talablar
-
-- Node.js 18+
-- Python 3.10+
-- PostgreSQL (pgAdmin4)
-
-## 1. Database sozlash
-
-1. pgAdmin4 da yangi database yarating: `testplay`
-2. `.env` fayl yarating: `backend/.env`
-
-```
-DATABASE_URL=postgresql://postgres:SIZNING_PAROLINGIZ@localhost:5432/testplay
-SECRET_KEY=supersecretkey123
-```
-
-`SIZNING_PAROLINGIZ` o'rniga PostgreSQL parolingizni yozing.
-
-## 2. Backend
+## 1️⃣ Frontend O'rnatish
 
 ```bash
-pip install -r backend/requirements.txt
-npm run seed
-npm run backend
-```
-
-Backend `http://localhost:8000` da ishga tushadi.
-
-## 3. Frontend
-
-```bash
+# Asosiy papkada
 npm install
 npm run dev
 ```
 
-Frontend `http://localhost:5173` da ishga tushadi.
+Bosh sahifa: `http://localhost:5173`
 
-## 4. Kirish
+## 2️⃣ Backend O'rnatish
 
-- **Login**: admin / admin123
+```bash
+# Uzgame papkaga o'ting
+cd Uzgame
 
-## 5. Test qo'shish
+# Virtual environment yarating
+python -m venv .venv
 
-1. Kirish tugmasini bosing va login qiling
-2. "Test qo'shish" sahifasiga o'ting
-3. O'yinni tanlang
-4. Yangi bo'lim qo'shing (har bo'limga max 20 ta test)
-5. Bo'limni tanlang va testlarni qo'shing
+# Virtual environment'ni faollashtiring
+# Windows
+.venv\Scripts\activate
 
-## O'yinlar
+# Linux/Mac
+source .venv/bin/activate
 
-- **Baraban** — Barabanni aylantiring, tanlangan o'quvchi testga javob beradi
-- **Arqon tortish** — Jamoa testni to'g'ri yechsa arqonni tortadi
-- **So'z qidiruv** — So'z toping, keyin test yeching
-- **Viktorina** — Testlar asosida viktorina
-- **Chempion o'quvchi** — Turnir: testni yechgan g'olib
-- **Davlatni top** — Bayroq + test
-- **Millioner** — Yutuqli savol-javob
-- **Xotira o'yini** — Juft toping, test yeching
-- **Tezkor hisob** — Matematik testlar
-- **So'z topish** — Harflardan so'z tuzing, test yeching
+# Paketlarni o'rnatish
+pip install -r requirements.txt
+
+# Server ishga tushirish
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+Backend API: `http://localhost:8000`
+Swagger docs: `http://localhost:8000/docs`
+
+## 3️⃣ Bazani O'rnatish
+
+```bash
+cd Uzgame
+
+# Migratsiyalarni ishga tushirish (agar mavjud bo'lsa)
+alembic upgrade head
+
+# Bazani seed qilish (ixtiyoriy)
+python seed_all.py
+```
+
+## 📋 Tekshirish
+
+- Frontend: `npm run build` va `npm run preview`
+- Backend: `http://localhost:8000/docs` API docs
+- Typing: `npm run lint`
+
+## 🔗 Muhim Linklar
+
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:8000
+- Swagger Docs: http://localhost:8000/docs
+
+## 📝 Muhim Fayllar
+
+- `src/App.tsx` - Main routing
+- `src/lib/api.ts` - Backend API calls
+- `Uzgame/app/main.py` - Backend main app
+- `package.json` - Frontend dependencies
+- `Uzgame/requirements.txt` - Backend dependencies
+
+---
+
+**Tayyor! Now you can start developing. Ximoy vot! 🚀**

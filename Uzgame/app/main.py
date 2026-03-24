@@ -5,10 +5,12 @@ from sqlalchemy.orm import Session
 from app.database import engine, get_db, Base
 from app.models.user import User as UserModel
 from app.models.rooster import RoosterQuestion
+from app.models.testnew import TestNew  # testnew jadvali uchun
+from app.models.game_test_bank import GameTestBank
 from app.schemas.userschemas import UserCreate, User as UserSchema, Token
 from app.auth.auth import authenticate_user, create_access_token, get_password_hash, get_current_user, \
     ACCESS_TOKEN_EXPIRE_MINUTES
-from app.routers import games, multiplayer, team_games, rooster, game_tests, baraban
+from app.routers import games, multiplayer, team_games, rooster, game_tests, baraban, game_test_bank
 from app.routers import test as test_router
 from app.routers import sections as sections_router
 from datetime import timedelta
@@ -57,6 +59,7 @@ app.include_router(test_router.router)
 app.include_router(sections_router.router)
 app.include_router(game_tests.router)
 app.include_router(baraban.router)
+app.include_router(game_test_bank.router)
 
 @app.get("/health")
 def health_check():

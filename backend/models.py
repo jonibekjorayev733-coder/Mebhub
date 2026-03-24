@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Text, JSON
+from sqlalchemy import Column, Integer, String, ForeignKey, Text, JSON, DateTime, Boolean
 from sqlalchemy.orm import relationship
 from database import Base
+from datetime import datetime
 
 
 class User(Base):
@@ -9,6 +10,21 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(100), unique=True, nullable=False, index=True)
     password_hash = Column(String(255), nullable=False)
+
+
+class Teacher(Base):
+    __tablename__ = "teachers"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String(100), unique=True, nullable=False, index=True)
+    email = Column(String(100), unique=True, nullable=False)
+    password_hash = Column(String(64), nullable=False)  # SHA256 hash (64 hex chars)
+    full_name = Column(String(200), nullable=True)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    custom_tests = relationship("CustomTest", back_populates="teacher")
 
 
 class Game(Base):
@@ -51,3 +67,68 @@ class Test(Base):
     difficulty = Column(String(20), default="medium")
 
     section = relationship("Section", back_populates="tests")
+
+
+class CustomTest(Base):
+    __tablename__ = "custom_tests"
+
+    id = Column(Integer, primary_key=True, index=True)
+    teacher_id = Column(Integer, ForeignKey("teachers.id"), nullable=False)
+    game_slug = Column(String(50), nullable=False, index=True)
+    question = Column(Text, nullable=False)
+    options = Column(JSON, nullable=False)  # JSON array of 4 strings
+    correct_index = Column(Integer, nullable=False)  # 0-3
+    explanation = Column(Text, nullable=True)
+    difficulty = Column(String(20), default="medium")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    teacher = relationship("Teacher", back_populates="custom_tests")
+
+
+# -------------------------------------------------------------------
+# Dashboard auth + tests + results (FastAPI + SQLAlchemy + JWT)
+# -------------------------------------------------------------------
+class AuthAccount(Base):
+    __tablename__ = "auth_accounts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String(255), unique=True, nullable=False, index=True)
+    password_hash = Column(String(255), nullable=False)
+    role = Column(String(20), nullable=False, default="user", index=True)  # user | teacher
+    full_name = Column(String(200), nullable=True)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    teacher_tests = relationship("TeacherTest", back_populates="teacher", foreign_keys="TeacherTest.teacher_id")
+    user_results = relationship("TestResult", back_populates="user", foreign_keys="TestResult.user_id")
+
+
+class TeacherTest(Base):
+    __tablename__ = "teacher_tests"
+
+    id = Column(Integer, primary_key=True, index=True)
+    teacher_id = Column(Integer, ForeignKey("auth_accounts.id"), nullable=False, index=True)
+    title = Column(String(255), nullable=False)
+    description = Column(Text, nullable=True)
+    questions = Column(JSON, nullable=False)  # [{text, options[4], correctIndex, explanation}]
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    teacher = relationship("AuthAccount", back_populates="teacher_tests", foreign_keys=[teacher_id])
+    results = relationship("TestResult", back_populates="test", foreign_keys="TestResult.test_id")
+
+
+class TestResult(Base):
+    __tablename__ = "test_results"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("auth_accounts.id"), nullable=False, index=True)
+    test_id = Column(Integer, ForeignKey("teacher_tests.id"), nullable=False, index=True)
+    score = Column(Integer, nullable=False, default=0)
+    meta = Column(JSON, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("AuthAccount", back_populates="user_results", foreign_keys=[user_id])
+    test = relationship("TeacherTest", back_populates="results", foreign_keys=[test_id])

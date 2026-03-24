@@ -1,155 +1,347 @@
-import { useState } from "react";
-import NeonNavbar from "@/components/NeonNavbar";
-import { NeonFooter } from "@/components/NeonFooterCTA";
-import { motion } from "framer-motion";
-import { RotateCcw } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Loader2, Trophy } from "lucide-react";
 
-type MQuestion = { q: string; options: string[]; correct: number; prize: string };
+interface Question {
+  id: number;
+  q: string;
+  opts: string[];
+  correct: number;
+  difficulty: string;
+  explanation: string;
+  points: number;
+}
 
-const mQuestions: MQuestion[] = [
-  { q: "O'zbekiston mustaqillik kuni?", options: ["1 Sentyabr", "8 Dekabr", "21 Mart", "9 May"], correct: 0, prize: "100" },
-  { q: "1 km necha metr?", options: ["100", "1000", "10000", "500"], correct: 1, prize: "500" },
-  { q: "Eng kichik tub son qaysi?", options: ["0", "1", "2", "3"], correct: 2, prize: "1,000" },
-  { q: "O'zbekiston aholisi taxminan qancha?", options: ["20 mln", "36 mln", "45 mln", "15 mln"], correct: 1, prize: "5,000" },
-  { q: "Eng uzun daryo?", options: ["Nil", "Amazonka", "Missisipi", "Amudayo"], correct: 0, prize: "10,000" },
-  { q: "Yorug'lik tezligi qancha?", options: ["300 km/s", "300,000 km/s", "150,000 km/s", "1,000,000 km/s"], correct: 1, prize: "50,000" },
-  { q: "Kim \"Nisbiylik nazariyasi\"ni yaratgan?", options: ["Nyuton", "Eynshteyn", "Galiley", "Xoking"], correct: 1, prize: "100,000" },
-  { q: "O'zbekistondagi eng baland tog'?", options: ["Chimyon", "Hazrat Sulton", "Beshtor", "Pulotxon"], correct: 1, prize: "500,000" },
-  { q: "DNK qisqartmasi nimani bildiradi?", options: ["Dezoksiribonuklein kislota", "Dinamik nuklein kislota", "Dinitrogen kislota", "Dioxid nuklein kislota"], correct: 0, prize: "1,000,000" },
+const PRIZE_LEVELS = [
+  { level: 1, amount: 100, difficulty: "Oson" },
+  { level: 2, amount: 500, difficulty: "Oson" },
+  { level: 3, amount: 1000, difficulty: "Oson" },
+  { level: 4, amount: 5000, difficulty: "O'rta" },
+  { level: 5, amount: 10000, difficulty: "O'rta" },
+  { level: 6, amount: 25000, difficulty: "O'rta" },
+  { level: 7, amount: 50000, difficulty: "Qiyin" },
+  { level: 8, amount: 100000, difficulty: "Qiyin" },
+  { level: 9, amount: 500000, difficulty: "Qiyin" },
+  { level: 10, amount: 1000000, difficulty: "Qiyin" },
 ];
 
-const MillionaireGame = () => {
-  const [current, setCurrent] = useState(0);
-  const [selected, setSelected] = useState<number | null>(null);
-  const [showResult, setShowResult] = useState(false);
+export default function MillionaireGame() {
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [currentLevel, setCurrentLevel] = useState(0);
+  const [totalWinnings, setTotalWinnings] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [answered, setAnswered] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [gameOver, setGameOver] = useState(false);
-  const [won, setWon] = useState(false);
-  const [finalPrize, setFinalPrize] = useState("0");
+  const [error, setError] = useState<string | null>(null);
 
-  const handleAnswer = (idx: number) => {
-    if (showResult) return;
-    setSelected(idx);
-    setShowResult(true);
+  const restartGame = () => {
+    localStorage.removeItem("millionaireGameState");
+    setCurrentLevel(0);
+    setTotalWinnings(0);
+    setSelectedAnswer(null);
+    setAnswered(false);
+    setGameOver(false);
+  };
+
+  const finishGame = () => {
+    localStorage.removeItem("millionaireGameState");
+    const safeAmount = currentLevel > 0 ? PRIZE_LEVELS[currentLevel - 1].amount : 0;
+    setTotalWinnings(safeAmount);
+    setGameOver(true);
+  };
+
+  useEffect(() => {
+    fetchQuestions();
+  }, []);
+
+  const MOCK_QUESTIONS: Question[] = [
+    {
+      id: 1,
+      q: "Prezident Sh.M.Mirziyoyev necha yildan boshlab O'zbekistan prezidenti?",
+      opts: ["2014 yildan", "2016 yildan", "2018 yildan", "2020 yildan"],
+      correct: 1,
+      difficulty: "O'rta",
+      explanation: "Shavkat Mirziyoyev 2016 yil 14 avgustdan O'zbekiston Respublikasining prezidenti.",
+      points: 100,
+    },
+    {
+      id: 2,
+      q: "O'zbekiston qaysi era o'lkasi bilan chegarani bo'linadi?",
+      opts: ["Qazoxistan va Turkmanistan", "Qazoxistan va Qirgiziston", "Afg'oniston va Pakiston", "Qozoqistan va Afg'oniston"],
+      correct: 0,
+      difficulty: "Oson",
+      explanation: "O'zbekiston Qozog'iston va Turkmanistan bilan shamol tomondagi chegarani bo'linadi.",
+      points: 500,
+    },
+    {
+      id: 3,
+      q: "Qaysi Xonlik O'zbekiston teritoriyasida eng yog'un shakl olgan?",
+      opts: ["Buxoro Xonligi", "Xiva Xonligi", "Kokand Xonligi", "Samarqand Xonligi"],
+      correct: 2,
+      difficulty: "Qiyin",
+      explanation: "Kokand Xonligi O'zbekiston teritoriyasida eng yog'un shakl olgan.",
+      points: 1000,
+    },
+    {
+      id: 4,
+      q: "O'zbekiston davlatining birinchi hujjati nima?",
+      opts: ["Konstitutsiya", "Qonun", "Nizom", "Farmoni prezident"],
+      correct: 0,
+      difficulty: "Oson",
+      explanation: "Konstitutsiya O'zbekiston davlatining asosiy hujjatidir.",
+      points: 5000,
+    },
+    {
+      id: 5,
+      q: "O'zbekiston milliy valyutasi nima?",
+      opts: ["So'm", "Tiyona", "Manat", "Tenge"],
+      correct: 0,
+      difficulty: "Oson",
+      explanation: "O'zbekiston milliy valyutasi So'm.",
+      points: 10000,
+    },
+    {
+      id: 6,
+      q: "Samarqand qaysi asrda qurilgan?",
+      opts: ["VI asrda", "VII asrda", "VIII asrda", "IX asrda"],
+      correct: 0,
+      difficulty: "O'rta",
+      explanation: "Samarqand VI asrda qurilgan, bu juda qadimiy shahar.",
+      points: 25000,
+    },
+    {
+      id: 7,
+      q: "Timur (Temur) kimning voqea bo'lgan?",
+      opts: ["Baxshisroy", "Harbiy rahbar", "Sarapa faqir", "Shoir"],
+      correct: 1,
+      difficulty: "O'rta",
+      explanation: "Timur - 14-asrda yashagan buyuk harbiy rahbar va amir.",
+      points: 50000,
+    },
+    {
+      id: 8,
+      q: "O'zbekiston qaysi va/yoki qaysi kontinentlarda joylashgan?",
+      opts: ["Faqat Osiyada", "Asiya va Yevropada", "Faqat Yevropada", "Afrikada"],
+      correct: 1,
+      difficulty: "Qiyin",
+      explanation: "O'zbekiston Markaziy Osiya (Asiya) va Yevropaning chegara sohalarida joylashgan.",
+      points: 100000,
+    },
+    {
+      id: 9,
+      q: "Qoldan Darya O'zbekistonda qaysi viloyatdan o'tadi?",
+      opts: ["Surxondarya", "Buxoro", "Xorazm", "Qashqadarya"],
+      correct: 2,
+      difficulty: "Qiyin",
+      explanation: "Qoldan Darya Xorazm viloyatining asosiy vodiy.",
+      points: 500000,
+    },
+    {
+      id: 10,
+      q: "O'zbekiston kimya sanoatining asosiy xom ashyosi nima?",
+      opts: ["Miy", "Gaz", "Eritma", "Ko'mir"],
+      correct: 1,
+      difficulty: "O'rta",
+      explanation: "O'zbekiston tabiiy gaz va neft bo'yicha boy, bu kimya sanoatining asosiy xom ashlari.",
+      points: 1000000,
+    },
+  ];
+
+  const fetchQuestions = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch("http://localhost:8000/api/game-tests/millionaire/questions?count=10");
+      if (!response.ok) {
+        throw new Error(`Backend xatosi: HTTP ${response.status}`);
+      }
+      const data = await response.json();
+      if (data && data.questions && data.questions.length > 0) {
+        setQuestions(data.questions);
+      } else {
+        throw new Error("Backend savollari bo'sh");
+      }
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Noma'lum xato";
+      console.error("Savollari yuklashda xato:", errorMsg);
+      setError(`❌ Server ishlamayapti`);
+      setQuestions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4">
+        <Card className="bg-red-900 border-red-700 max-w-md">
+          <CardContent className="pt-8 text-center">
+            <p className="text-xl text-red-100 mb-4">{error}</p>
+            <Button onClick={() => window.location.reload()} size="lg" className="w-full bg-blue-600 hover:bg-blue-700">
+              Qayta Urinish
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!questions.length) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-xl text-slate-400">Savollar yuklanmadi</p>
+      </div>
+    );
+  }
+
+  if (gameOver) {
+    return (
+      <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4">
+        <Card className="bg-gradient-to-r from-yellow-900 to-orange-900 border-yellow-600 max-w-md">
+          <CardContent className="pt-8 text-center">
+            <Trophy className="w-16 h-16 mx-auto text-yellow-400 mb-4" />
+            <h2 className="text-3xl font-bold text-white mb-2">O'yin Tugadi! 🎉</h2>
+            <p className="text-2xl text-yellow-300 font-bold mb-6">Jami Yutuq: {totalWinnings}$</p>
+            <Button onClick={restartGame} size="lg" className="w-full bg-blue-600 hover:bg-blue-700">
+              Qayta O'ynash
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const question = questions[currentLevel];
+
+  const handleAnswer = (index: number) => {
+    if (answered) return;
+    setSelectedAnswer(index);
+    setAnswered(true);
+
+    if (index !== question.correct) {
+      setGameOver(true);
+      return;
+    }
+
+    if (currentLevel === questions.length - 1) {
+      setTotalWinnings(PRIZE_LEVELS[currentLevel].amount);
+      setGameOver(true);
+      return;
+    }
 
     setTimeout(() => {
-      if (idx === mQuestions[current].correct) {
-        if (current + 1 >= mQuestions.length) {
-          setWon(true);
-          setFinalPrize(mQuestions[current].prize);
-          setGameOver(true);
-        } else {
-          setCurrent((c) => c + 1);
-          setSelected(null);
-          setShowResult(false);
-        }
-      } else {
-        setFinalPrize(current > 0 ? mQuestions[current - 1].prize : "0");
-        setGameOver(true);
-      }
-    }, 1500);
+      setTotalWinnings(PRIZE_LEVELS[currentLevel].amount);
+      setCurrentLevel(prev => prev + 1);
+      setSelectedAnswer(null);
+      setAnswered(false);
+    }, 2000);
   };
-
-  const reset = () => {
-    setCurrent(0);
-    setSelected(null);
-    setShowResult(false);
-    setGameOver(false);
-    setWon(false);
-    setFinalPrize("0");
-  };
-
-  const q = mQuestions[current];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-black to-neon-orange/5 relative overflow-hidden">
-      {/* Decorative stickers */}
-      <motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} className="absolute top-32 right-8 text-5xl z-0">💰</motion.div>
-      <motion.div animate={{ y: [0, -20, 0] }} transition={{ duration: 3.5, repeat: Infinity }} className="absolute bottom-40 left-10 text-4xl z-0">🏆</motion.div>
-      <motion.div animate={{ rotate: -360 }} transition={{ duration: 26, repeat: Infinity, ease: "linear" }} className="absolute top-1/2 right-1/4 text-5xl z-0">⭐</motion.div>
-      
-      <NeonNavbar />
-      <div className="pt-24 pb-16 container max-w-2xl relative z-10">
-        <motion.h1 
-          initial={{ opacity: 0, y: -20 }} 
-          animate={{ opacity: 1, y: 0 }} 
-          className="text-5xl md:text-6xl font-display font-black text-center mb-8"
-        >
-          💰 <span className="bg-gradient-to-r from-neon-orange via-yellow-400 to-neon-orange bg-clip-text text-transparent animate-pulse" style={{ textShadow: "0 0 20px hsl(25 100% 55% / 0.8)" }}>MILLIONER</span>
-        </motion.h1>
-        <motion.p 
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }} 
-          transition={{ delay: 0.2 }}
-          className="text-center text-lg text-orange-300 font-semibold mb-8"
-        >
-          🏆 YUTUQ OLISH 🏆
-        </motion.p>
-
-        {gameOver ? (
-          <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="neon-card p-8 text-center">
-            <p className="text-5xl mb-4">{won ? "🎉" : "😔"}</p>
-            <p className="font-display font-black text-xl mb-2 text-neon-cyan">{won ? "TABRIKLAYMIZ!" : "O'YIN TUGADI"}</p>
-            <p className="text-muted-foreground mb-2">Yutuq:</p>
-            <p className="text-4xl font-display font-black text-neon-green">{finalPrize} so'm</p>
-            <button onClick={reset} className="neon-btn mt-6 inline-flex items-center gap-2">
-              <RotateCcw className="w-4 h-4" /> QAYTA
-            </button>
-          </motion.div>
-        ) : (
-          <div className="grid md:grid-cols-[1fr_200px] gap-6">
-            <div>
-              <motion.div key={current} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="neon-card p-6 mb-6">
-                <p className="text-sm text-neon-yellow font-display mb-2">SAVOL {current + 1} — {q.prize} so'm</p>
-                <p className="text-xl font-bold text-foreground">{q.q}</p>
-              </motion.div>
-
-              <div className="grid grid-cols-2 gap-3">
-                {q.options.map((opt, i) => {
-                  let borderCls = "border-border hover:border-neon-cyan/50";
-                  if (showResult) {
-                    if (i === q.correct) borderCls = "border-neon-green bg-neon-green/10";
-                    else if (i === selected) borderCls = "border-destructive bg-destructive/10";
-                  }
-                  return (
-                    <button
-                      key={i}
-                      onClick={() => handleAnswer(i)}
-                      disabled={showResult}
-                      className={`bg-card border-2 rounded-xl p-4 text-left transition-all ${borderCls}`}
-                    >
-                      <span className="text-muted-foreground font-display text-sm mr-2">{String.fromCharCode(65 + i)}:</span>
-                      <span className="text-foreground font-semibold">{opt}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Prize ladder */}
-            <div className="neon-card p-4 hidden md:block">
-              <p className="font-display text-xs text-muted-foreground mb-3 tracking-wider">YUTUQLAR</p>
-              <div className="space-y-1">
-                {[...mQuestions].reverse().map((mq, i) => {
-                  const idx = mQuestions.length - 1 - i;
-                  return (
-                    <div
-                      key={idx}
-                      className={`text-xs py-1 px-2 rounded font-display ${
-                        idx === current ? "bg-neon-cyan/20 text-neon-cyan font-bold" : idx < current ? "text-neon-green/60" : "text-muted-foreground/40"
-                      }`}
-                    >
-                      {mq.prize}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-4 py-12">
+      <div className="max-w-5xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-white mb-4 flex items-center justify-center gap-3">
+            <Trophy className="w-8 h-8 text-yellow-400" />
+            Millioner O'yini
+            <Trophy className="w-8 h-8 text-yellow-400" />
+          </h1>
+          <div className="flex justify-center">
+            <Button
+              onClick={finishGame}
+              className="bg-red-600 hover:bg-red-700 text-white font-bold"
+            >
+              O'yinni Tugatish
+            </Button>
           </div>
-        )}
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {/* Prize Ladder */}
+          <Card className="bg-slate-800 border-slate-700 md:col-span-1 h-fit">
+            <CardHeader>
+              <CardTitle className="text-white">Prize Ladder</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {PRIZE_LEVELS.map((prize, index) => (
+                  <div
+                    key={index}
+                    className={`p-2 rounded text-center transition-all ${
+                      index === currentLevel
+                        ? "bg-yellow-600 text-white font-bold scale-110"
+                        : index < currentLevel
+                        ? "bg-green-900 text-green-200"
+                        : "bg-slate-700 text-slate-300"
+                    }`}
+                  >
+                    <span className="font-bold">{prize.amount}$</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Question */}
+          <Card className="bg-slate-800 border-slate-700 md:col-span-2">
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <CardTitle className="text-white">Level {currentLevel + 1}</CardTitle>
+                <span className="text-yellow-400 font-bold">{PRIZE_LEVELS[currentLevel].amount}$</span>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <p className="text-lg text-white font-semibold mb-4">{question.q}</p>
+                <p className="text-sm text-slate-400">Difficulty: {question.difficulty}</p>
+              </div>
+
+              <div className="space-y-3">
+                {question.opts.map((option, index) => (
+                  <Button
+                    key={index}
+                    onClick={() => handleAnswer(index)}
+                    disabled={answered}
+                    variant="outline"
+                    className={`h-auto py-4 px-4 text-left justify-start text-base transition-all ${
+                      selectedAnswer === index
+                        ? index === question.correct
+                          ? "bg-green-600 border-green-600 text-white"
+                          : "bg-red-600 border-red-600 text-white"
+                        : answered && index === question.correct
+                        ? "bg-green-600 border-green-600 text-white"
+                        : "border-slate-600 text-slate-300 hover:border-yellow-500"
+                    }`}
+                  >
+                    <span className="font-bold mr-3 text-lg">{String.fromCharCode(65 + index)}.</span>
+                    {option}
+                  </Button>
+                ))}
+              </div>
+
+              {answered && (
+                <div className={`p-4 rounded-lg ${selectedAnswer === question.correct ? "bg-green-900 text-green-200" : "bg-red-900 text-red-200"}`}>
+                  <p className="font-semibold mb-2">
+                    {selectedAnswer === question.correct ? "✓ To'g'ri!" : "✗ Noto'g'ri"}
+                  </p>
+                  <p className="text-sm">{question.explanation}</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
-      <NeonFooter />
     </div>
   );
-};
-
-export default MillionaireGame;
+}
