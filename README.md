@@ -1,66 +1,81 @@
-# Interaktiv-ta'lim
+# UzGame - O'zbekcha Interaktiv Ta'lim Platformasi
 
-Ta'lim platformasi — 15+ interaktiv o'yin, testlar va database bilan integratsiya.
+Tasodifiy o'yinlari orqali o'quvchilar bilimlarini sinab ko'rishish uchun modern web platformasi.
 
-## Ishga tushirish
+## 🚀 Texnologiyalar
 
-### 1. PostgreSQL
+- **Frontend:** React 18, TypeScript, Vite, Tailwind CSS
+- **Backend:** FastAPI, SQLAlchemy, SQLite
+- **Authentication:** JWT + bcrypt
 
-PostgreSQL o'rnating va database yarating. `.env` da `DATABASE_URL` ni o'rnating:
+## 📦 Loyiha Struktura
 
-```env
-DATABASE_URL=postgresql://postgres:PAROL@localhost:5432/postgres
-SECRET_KEY=sizning-maxfiy-kalitingiz
+```
+├── src/                    # React Frontend
+│   ├── components/         # UI Components
+│   ├── pages/              # Page Components
+│   ├── contexts/           # Auth Context
+│   ├── hooks/              # Custom Hooks
+│   ├── lib/                # Utilities
+│   └── App.tsx             # Main App
+├── backend/                # FastAPI Server
+│   ├── routers/            # API Routes
+│   ├── models.py           # Database Models
+│   ├── auth.py             # Authentication
+│   └── main.py             # FastAPI App
+├── public/                 # Static Files
+└── package.json            # Dependencies
 ```
 
-### 2. Backend
+## ⚡ Tezkor Boshlash
 
-```bash
-# Sarflanmalarni o'rnatish
-cd backend
-pip install -r requirements.txt
-
-# Users jadvalini tuzatish (agar xato bo'lsa)
-python migrate_db.py
-
-# Database'ni to'ldirish (o'yinlar, testlar)
-python seed.py
-
-# Backend ishga tushirish
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-
-Yoki root papkada:
-```bash
-npm run migrate   # users jadvalini tuzatish
-npm run seed      # seed
-npm run backend   # backend
-```
-
-### 3. Frontend
-
+### Frontend Setup
 ```bash
 npm install
 npm run dev
 ```
+Oyna: http://localhost:5173
 
-Sahifa: **http://localhost:5173**
+### Backend Setup
+```bash
+cd backend
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+python -m uvicorn main:app --reload --port 8000
+```
+API: http://localhost:8000
 
-### 4. Login
+## 🎮 O'yinlar
 
-- **Admin:** `admin` / `admin123` (seed qilgandan keyin)
-- Backend ishlamasa: demo rejim — `admin` / `admin123` bilan UI ko'rish mumkin
+- **Baraban** - Ehtimollik o'yini
+- **Millionaire** - Savol-javob o'yini
+- **Word Search** - So'z izlash
+- **Hidden Hourglass** - Vaqt o'yini
+- **Davlatni Topish** - Geografiya
+- **Shumod Oyini** - Matematika
+- **Temur's Conquest** - Tarixiy o'yin
 
-## Texnologiyalar
+## 👨‍🏫 O'qituvchi Paneli
 
-- **Frontend:** React, Vite, TailwindCSS, TypeScript
-- **Backend:** FastAPI, SQLAlchemy
-- **Database:** PostgreSQL
+- Register/Login
+- Test yaratish
+- Natijalari ko'rish
+- Parolini o'zgartirish
 
-## Xususiyatlar
+## 🔐 Test Userlari
 
-- 15 ta interaktiv o'yin (Baraban, Arqon tortish, Viktorina, Millioner, Xotira, va boshqalar)
-- Test qo'shish — database'ga saqlanadi
-- Login tizimi
-- Responsive dizayn
-- Backend status indikatori
+| Email | Parol | Role |
+|-------|-------|------|
+| admin@example.com | admin123 | Teacher |
+| test@example.com | test123 | Teacher |
+
+## 🔗 Links
+
+- GitHub: https://github.com/jonibekjorayev733-coder/gamesite
+- Frontend: http://localhost:5173
+- API Docs: http://localhost:8000/docs
+
+## 📝 Lisenziya
+
+MIT
