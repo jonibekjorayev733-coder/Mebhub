@@ -28,23 +28,35 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Passwordni verify qilish"""
-    return pwd_context.verify(plain_password, hashed_password)
+    """Passwordni verify qilish - bcrypt 72 byte limitini hisobga olish"""
+    try:
+        # Bcrypt has a 72 byte limit - truncate if necessary
+        truncated_password = plain_password[:72]
+        return pwd_context.verify(truncated_password, hashed_password)
+    except Exception as e:
+        logger.error(f"Password verification error: {e}")
+        return False
 
 
 def get_password_hash(password: str) -> str:
-    """Password xeshini olish"""
-    return pwd_context.hash(password)
+    """Password xeshini olish - bcrypt 72 byte limitini hisobga olish"""
+    # Bcrypt has a 72 byte limit - truncate if necessary
+    truncated_password = password[:72]
+    return pwd_context.hash(truncated_password)
 
 
 def authenticate_user(db: Session, email: str, password: str) -> Optional[Med]:
     """Userni email va password orqali authenticate qilish"""
-    user = db.query(Med).filter(Med.email == email).first()
-    if not user:
+    try:
+        user = db.query(Med).filter(Med.email == email).first()
+        if not user:
+            return False
+        if not user.hashed_password or not verify_password(password, user.hashed_password):
+            return False
+        return user
+    except Exception as e:
+        logger.error(f"Authentication error: {e}")
         return False
-    if not user.hashed_password or not verify_password(password, user.hashed_password):
-        return False
-    return user
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
