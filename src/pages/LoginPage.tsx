@@ -183,13 +183,13 @@ export default function LoginPage() {
               Don't have an account?{' '}
               <button
                 onClick={() => {
-                  setEmail('');
-                  setPassword('');
+                  setEmail('demo@example.com');
+                  setPassword('demo123');
                   setError('');
                 }}
                 className="text-cyan-400 hover:text-cyan-300 font-semibold transition"
               >
-                Try: test@example.com / test123
+                Auto-fill Demo Credentials
               </button>
             </p>
           </div>
@@ -197,10 +197,18 @@ export default function LoginPage() {
           {/* Footer Info */}
           <div className="mt-6 pt-6 border-t border-slate-700/50">
             <div className="text-center">
-              <h3 className="text-white font-semibold mb-3">Test Accounts</h3>
-              <div className="space-y-2 text-sm text-slate-400">
-                <p>Email: <span className="text-slate-300">test@example.com</span></p>
-                <p>Password: <span className="text-slate-300">test123</span></p>
+              <h3 className="text-white font-semibold mb-3">Demo Accounts</h3>
+              <div className="space-y-3 text-sm text-slate-400">
+                <div>
+                  <p className="font-semibold text-cyan-400">Admin Account</p>
+                  <p>Email: <span className="text-slate-300">demo@example.com</span></p>
+                  <p>Password: <span className="text-slate-300">demo123</span></p>
+                </div>
+                <div className="pt-2 border-t border-slate-600/30">
+                  <p className="font-semibold text-blue-400">Alternative Admin</p>
+                  <p>Email: <span className="text-slate-300">admin@example.com</span></p>
+                  <p>Password: <span className="text-slate-300">admin123</span></p>
+                </div>
               </div>
             </div>
           </div>
