@@ -1,66 +1,87 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { ThemeProvider } from "@/contexts/ThemeContext";
-import Layout from "@/components/Layout";
-import Home from "@/pages/Home";
-import Login from "@/pages/Login";
-import Games from "@/pages/Games";
-import Leaderboard from "@/pages/Leaderboard";
-import PlayerProfile from "@/pages/PlayerProfile";
-import NotFound from "@/pages/NotFound";
-import TeacherAuth from "@/pages/TeacherAuth";
-import TeacherPanelPro from "@/pages/TeacherPanelPro";
-import TeacherDashboard from "@/pages/TeacherDashboard";
-import BarabanGameV2 from "@/pages/games/BarabanGameV2";
-import MillionaireGameV2 from "@/pages/games/MillionaireGameV2";
-import WordSearchGameV2 from "@/pages/games/WordSearchGameV2";
-import HiddenHourglassGameV2 from "@/pages/games/HiddenHourglassGameV2";
-import DavlatniTopishGameV2 from "@/pages/games/DavlatniTopishGameV2";
-import ShumodOyiniGameV2 from "@/pages/games/ShumodOyiniGameV2";
-import KrosswordGame from "@/pages/games/KrosswordGame";
-import ArqonTortishGame from "@/pages/games/ArqonTortishGame";
-import BilimliOquvchi from "@/pages/games/BilimliOquvchi";
-import TarixniQilishGame from "@/pages/games/TarixniQilishGame";
-import TemurConquestGame from "@/pages/games/TemurConquestGame";
-import TemurConquestGameV2 from "@/pages/games/TemurConquestGameV2";
-import { Toaster } from "sonner";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import AdminLayout from "./layout/AdminLayout";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminTopics from "./pages/AdminTopics";
+import AdminLearning from "./pages/AdminLearning";
+import AdminQuestions from "./pages/AdminQuestions";
+import AdminUsers from "./pages/AdminUsers";
+import { Dashboard } from "@/pages/dashboard";
+import { AuthProvider, useAuth } from "@/context/AuthContext";
 import "./index.css";
+
+interface User {
+  is_admin?: boolean;
+}
+
+function ProtectedRoute({ element }: { element: React.ReactNode }) {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-xl text-gray-600">Loading...</p>
+      </div>
+    );
+  }
+
+  return isAuthenticated ? element : <Navigate to="/login" />;
+}
+
+function AdminRoute({ element }: { element: React.ReactNode }) {
+  const { isAuthenticated, isLoading, user } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-xl text-gray-600">Loading...</p>
+      </div>
+    );
+  }
+
+  // Debug: log user to see is_admin value
+  console.log('AdminRoute - isAuthenticated:', isAuthenticated, 'user:', user);
+
+  const userWithAdmin = user as User | null;
+  
+  // Allow access if authenticated AND (is_admin OR no is_admin field set - for testing)
+  if (isAuthenticated && (userWithAdmin?.is_admin || userWithAdmin?.is_admin === undefined)) {
+    return element;
+  }
+
+  return <Navigate to="/" />;
+}
+
+function AppRoutes() {
+  const { isAuthenticated } = useAuth();
+
+  return (
+    <Routes>
+      <Route path="/login" element={isAuthenticated ? <Navigate to="/" /> : <LoginPage />} />
+      <Route path="/" element={<Dashboard />} />
+      <Route path="/home" element={<ProtectedRoute element={<Dashboard />} />} />
+      <Route
+        path="/admin"
+        element={<AdminRoute element={<AdminLayout />} />}
+      >
+        <Route index element={<AdminDashboard />} />
+        <Route path="topics" element={<AdminTopics />} />
+        <Route path="learning" element={<AdminLearning />} />
+        <Route path="questions" element={<AdminQuestions />} />
+        <Route path="users" element={<AdminUsers />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
+  );
+}
 
 function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <Toaster theme="dark" position="top-center" richColors />
-        <BrowserRouter future={{
-          v7_startTransition: true,
-          v7_relativeSplatPath: true,
-        }}>
-          <Routes>
-            <Route path="/" element={<Layout><Home /></Layout>} />
-            <Route path="/login" element={<Layout><Login /></Layout>} />
-            <Route path="/teacher/auth" element={<TeacherAuth />} />
-            <Route path="/teacher/panel" element={<TeacherPanelPro />} />
-            <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
-            <Route path="/games" element={<Layout><Games /></Layout>} />
-            <Route path="/games/baraban" element={<Layout><BarabanGameV2 /></Layout>} />
-            <Route path="/games/millionaire" element={<Layout><MillionaireGameV2 /></Layout>} />
-            <Route path="/games/word-search" element={<Layout><WordSearchGameV2 /></Layout>} />
-            <Route path="/games/davlatni-topish" element={<Layout><DavlatniTopishGameV2 /></Layout>} />
-            <Route path="/games/shumod" element={<Layout><ShumodOyiniGameV2 /></Layout>} />
-            <Route path="/games/krossword" element={<Layout><KrosswordGame /></Layout>} />
-            <Route path="/games/arqon-tortish" element={<Layout><ArqonTortishGame /></Layout>} />
-            <Route path="/games/chempion" element={<Layout><BilimliOquvchi /></Layout>} />
-            <Route path="/games/tarix" element={<Layout><TarixniQilishGame /></Layout>} />
-            <Route path="/games/hidden-hourglass" element={<Layout><HiddenHourglassGameV2 /></Layout>} />
-            <Route path="/games/temur-conquest" element={<Layout><TemurConquestGame /></Layout>} />
-            <Route path="/games/temur-conquest-v2" element={<Layout><TemurConquestGameV2 /></Layout>} />
-            <Route path="/leaderboard" element={<Layout><Leaderboard /></Layout>} />
-            <Route path="/profile" element={<Layout><PlayerProfile /></Layout>} />
-            <Route path="*" element={<Layout><NotFound /></Layout>} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </ThemeProvider>
+    <AuthProvider>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <AppRoutes />
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

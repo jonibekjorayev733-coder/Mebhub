@@ -1,0 +1,40 @@
+.Header {
+    height: 100px;
+    width: 100%;
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    background-color: rgb(32, 27, 27);
+    color: white;
+    padding: 10px 30px;
+
+
+}
+
+.Header .h1 {
+    font-size: 20px;
+    font-weight: 600
+}
+
+.Header ul {
+    gap: 50px;
+    text-align: center;
+    list-style: none;
+    display: flex;
+}
+
+.Header ul li a {
+    text-decoration: none;
+    color: white;
+}
+
+.Header .buttons {
+    display: flex;
+    gap: 20px;
+}
+
+.Header .buttons button {
+    width: 100px;
+    height: 30px;
+
+}
