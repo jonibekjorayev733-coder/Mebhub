@@ -132,6 +132,20 @@ async def create_item(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# Create alias endpoints for frontend compatibility
+@router.post("/learning-items")
+async def create_learning_item(
+    request: CreateItemRequest,
+    db: Session = Depends(get_db),
+    admin: Med = Depends(check_admin)
+):
+    """
+    Yangi o'rganish elementi qo'shish (alias)
+    POST /admin/learning-items
+    """
+    return await create_item(request, db, admin)
+
+
 # CREATE TEST QUESTION
 @router.post("/questions")
 async def create_question(
@@ -201,6 +215,264 @@ async def get_all_topics(
             for topic in topics
         ]
     except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# GET ALL LEARNING ITEMS
+@router.get("/learning-items")
+async def get_all_learning_items(
+    db: Session = Depends(get_db),
+    admin: Med = Depends(check_admin)
+):
+    """
+    Barcha o'rganish elementlarini olish
+    GET /admin/learning-items
+    """
+    try:
+        items = db.query(LearningItem).order_by(LearningItem.order).all()
+        return [
+            {
+                "id": item.id,
+                "topic_id": item.topic_id,
+                "latin_term": item.latin_term,
+                "uzbek_term": item.uzbek_term,
+                "description": item.description,
+                "order": item.order
+            }
+            for item in items
+        ]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# GET ALL QUESTIONS
+@router.get("/questions")
+async def get_all_questions(
+    db: Session = Depends(get_db),
+    admin: Med = Depends(check_admin)
+):
+    """
+    Barcha test savollarini olish
+    GET /admin/questions
+    """
+    try:
+        questions = db.query(TestQuestion).order_by(TestQuestion.order).all()
+        return [
+            {
+                "id": question.id,
+                "topic_id": question.topic_id,
+                "question_text": question.question_text,
+                "correct_answer": question.correct_answer,
+                "options": question.options,
+                "difficulty": question.difficulty,
+                "order": question.order
+            }
+            for question in questions
+        ]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# GET ALL USERS
+@router.get("/users")
+async def get_all_users(
+    db: Session = Depends(get_db),
+    admin: Med = Depends(check_admin)
+):
+    """
+    Barcha foydalanuvchilarni olish
+    GET /admin/users
+    """
+    try:
+        users = db.query(Med).all()
+        return [
+            {
+                "id": user.id,
+                "email": user.email,
+                "full_name": user.full_name,
+                "is_admin": user.is_admin,
+                "created_at": str(user.created_at) if hasattr(user, 'created_at') else None
+            }
+            for user in users
+        ]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# DELETE TOPIC
+@router.delete("/topics/{topic_id}")
+async def delete_topic(
+    topic_id: int,
+    db: Session = Depends(get_db),
+    admin: Med = Depends(check_admin)
+):
+    """
+    Mavzuni o'chirish
+    DELETE /admin/topics/{topic_id}
+    """
+    try:
+        topic = db.query(MedicalTopic).filter(
+            MedicalTopic.id == topic_id
+        ).first()
+        
+        if not topic:
+            raise HTTPException(status_code=404, detail="Topic not found")
+        
+        # Delete related items and questions
+        db.query(LearningItem).filter(
+            LearningItem.topic_id == topic_id
+        ).delete()
+        db.query(TestQuestion).filter(
+            TestQuestion.topic_id == topic_id
+        ).delete()
+        
+        db.delete(topic)
+        db.commit()
+        
+        return {"message": "Topic deleted successfully"}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# DELETE USER
+@router.delete("/users/{user_id}")
+async def delete_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    admin: Med = Depends(check_admin)
+):
+    """
+    Foydalanuvchini o'chirish
+    DELETE /admin/users/{user_id}
+    """
+    try:
+        user = db.query(Med).filter(Med.id == user_id).first()
+        
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        db.delete(user)
+        db.commit()
+        
+        return {"message": "User deleted successfully"}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Create Admin User
+class CreateAdminRequest(BaseModel):
+    email: str
+    password: str
+    full_name: str = ""
+
+
+@router.post("/create-admin")
+async def create_admin(
+    request: CreateAdminRequest,
+    db: Session = Depends(get_db),
+    admin: Med = Depends(check_admin)
+):
+    """
+    Yangi admin foydalanuvchi qo'shish
+    POST /admin/create-admin
+    """
+    try:
+        from app.auth.auth import get_password_hash
+        
+        # Check if user already exists
+        existing = db.query(Med).filter(Med.email == request.email).first()
+        if existing:
+            raise HTTPException(status_code=400, detail="User already exists")
+        
+        # Create new admin
+        new_admin = Med(
+            email=request.email,
+            password_hash=get_password_hash(request.password),
+            full_name=request.full_name,
+            is_admin=True
+        )
+        
+        db.add(new_admin)
+        db.commit()
+        db.refresh(new_admin)
+        
+        return {
+            "id": new_admin.id,
+            "email": new_admin.email,
+            "full_name": new_admin.full_name,
+            "is_admin": new_admin.is_admin,
+            "message": "Admin created successfully"
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Update User to Admin
+@router.put("/users/{user_id}/make-admin")
+async def make_user_admin(
+    user_id: int,
+    db: Session = Depends(get_db),
+    admin: Med = Depends(check_admin)
+):
+    """
+    Foydalanuvchini admin qilish
+    PUT /admin/users/{user_id}/make-admin
+    """
+    try:
+        user = db.query(Med).filter(Med.id == user_id).first()
+        
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        user.is_admin = True
+        db.commit()
+        db.refresh(user)
+        
+        return {
+            "id": user.id,
+            "email": user.email,
+            "full_name": user.full_name,
+            "is_admin": user.is_admin,
+            "message": "User promoted to admin"
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Remove Admin Status
+@router.put("/users/{user_id}/remove-admin")
+async def remove_user_admin(
+    user_id: int,
+    db: Session = Depends(get_db),
+    admin: Med = Depends(check_admin)
+):
+    """
+    Foydalanuvchini admin statusdan chiqarish
+    PUT /admin/users/{user_id}/remove-admin
+    """
+    try:
+        user = db.query(Med).filter(Med.id == user_id).first()
+        
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        user.is_admin = False
+        db.commit()
+        db.refresh(user)
+        
+        return {
+            "id": user.id,
+            "email": user.email,
+            "full_name": user.full_name,
+            "is_admin": user.is_admin,
+            "message": "Admin status removed"
+        }
+    except Exception as e:
+        db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
 
 

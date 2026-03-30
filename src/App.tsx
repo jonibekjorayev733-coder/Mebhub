@@ -6,6 +6,8 @@ import AdminTopics from "./pages/AdminTopics";
 import AdminLearning from "./pages/AdminLearning";
 import AdminQuestions from "./pages/AdminQuestions";
 import AdminUsers from "./pages/AdminUsers";
+import AdminAuthentication from "./pages/AdminAuthentication";
+import AdminTestAdd from "./pages/AdminTestAdd";
 import { Dashboard } from "@/pages/dashboard";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import "./index.css";
@@ -69,6 +71,8 @@ function AppRoutes() {
         <Route path="learning" element={<AdminLearning />} />
         <Route path="questions" element={<AdminQuestions />} />
         <Route path="users" element={<AdminUsers />} />
+        <Route path="authentication" element={<AdminAuthentication />} />
+        <Route path="test-add" element={<AdminTestAdd />} />
       </Route>
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
