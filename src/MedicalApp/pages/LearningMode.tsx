@@ -64,10 +64,10 @@ export const LearningMode: React.FC<LearningModeProps> = ({ topicId, topicName, 
 
     if (loading) {
         return (
-            <div className="fixed inset-0 z-[100] bg-[var(--bg-dark)] flex items-center justify-center">
+            <div className="fixed inset-0 z-[100] bg-[var(--bg-dark)] flex items-center justify-center p-3 sm:p-4">
                 <div className="text-center">
-                    <div className="animate-spin w-12 h-12 border-4 border-[var(--accent-primary)]/20 border-t-[var(--accent-primary)] rounded-full mx-auto mb-4" />
-                    <p className="text-[var(--text-muted)] font-bold">Ma'lumotlar yuklanyapti...</p>
+                    <div className="animate-spin w-10 h-10 sm:w-12 sm:h-12 border-4 border-[var(--accent-primary)]/20 border-t-[var(--accent-primary)] rounded-full mx-auto mb-3 sm:mb-4" />
+                    <p className="text-[var(--text-muted)] font-bold text-sm sm:text-base">Ma'lumotlar yuklanyapti...</p>
                 </div>
             </div>
         );
@@ -75,10 +75,10 @@ export const LearningMode: React.FC<LearningModeProps> = ({ topicId, topicName, 
 
     if (error || items.length === 0) {
         return (
-            <div className="fixed inset-0 z-[100] bg-[var(--bg-dark)] flex flex-col items-center justify-center p-4">
-                <div className="text-center max-w-md">
-                    <h2 className="text-xl font-bold mb-4 text-red-500">Xato</h2>
-                    <p className="text-[var(--text-muted)] mb-6">{error || 'Dars ma\'lumotlari topilmadi'}</p>
+            <div className="fixed inset-0 z-[100] bg-[var(--bg-dark)] flex flex-col items-center justify-center p-3 sm:p-4">
+                <div className="text-center max-w-sm">
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-red-500">Xato</h2>
+                    <p className="text-[var(--text-muted)] mb-4 sm:mb-6 text-xs sm:text-sm">{error || 'Dars ma\'lumotlari topilmadi'}</p>
                     <NeonButton onClick={onExit}>ORQAGA QAYTISH</NeonButton>
                 </div>
             </div>
@@ -101,24 +101,24 @@ export const LearningMode: React.FC<LearningModeProps> = ({ topicId, topicName, 
                 animate={{ opacity: 1, scale: 1 }}
                 className="w-full max-w-6xl relative z-10"
             >
-                <div className="glass-card-ultra !p-6 md:!p-8 relative overflow-hidden border border-[var(--glass-border)] shadow-[0_30px_60px_var(--glass-shadow)] !rounded-2xl bg-[var(--bg-surface)]">
+                <div className="glass-card-ultra !p-4 sm:!p-6 md:!p-8 relative overflow-hidden border border-[var(--glass-border)] shadow-[0_30px_60px_var(--glass-shadow)] !rounded-2xl bg-[var(--bg-surface)]">
 
                     {/* Visual Learning Context - Premium */}
                     {currentItem.image && (
                         <motion.div
                             initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="mb-10 rounded-[2rem] overflow-hidden border-2 border-white/10 shadow-2xl relative group ring-4 ring-[#ff6b00]/5"
+                            className="mb-6 sm:mb-8 md:mb-10 rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden border-2 border-white/10 shadow-2xl relative group ring-4 ring-[#ff6b00]/5"
                         >
                             <img
                                 src={currentItem.image}
                                 alt={topicName}
-                                className="w-full h-auto object-cover max-h-[280px] group-hover:scale-110 transition-transform duration-500 ease-out"
+                                className="w-full h-auto object-cover max-h-[200px] sm:max-h-[250px] md:max-h-[280px] group-hover:scale-110 transition-transform duration-500 ease-out"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                            <div className="absolute bottom-4 left-6 flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-[#ff6b00] animate-pulse" />
-                                <span className="text-[9px] font-black text-white/70 uppercase tracking-[0.4em]">Vizual Kontekst</span>
+                            <div className="absolute bottom-2 sm:bottom-4 left-3 sm:left-6 flex items-center gap-2">
+                                <div className="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-[#ff6b00] animate-pulse" />
+                                <span className="text-[7px] sm:text-[9px] font-black text-white/70 uppercase tracking-[0.3em] sm:tracking-[0.4em]">Vizual Kontekst</span>
                             </div>
                         </motion.div>
                     )}
@@ -133,28 +133,28 @@ export const LearningMode: React.FC<LearningModeProps> = ({ topicId, topicName, 
                     </div>
 
                     {/* Compact Header */}
-                    <div className="flex justify-between items-center mb-6">
+                    <div className="flex justify-between items-center mb-4 sm:mb-6 gap-2">
                         <button
                             onClick={onExit}
-                            className="p-2 bg-white/5 hover:bg-white/10 rounded-lg transition-all border border-white/10 group"
+                            className="p-1.5 sm:p-2 bg-white/5 hover:bg-white/10 rounded-lg transition-all border border-white/10 group flex-shrink-0"
                         >
-                            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+                            <ArrowLeft size={14} className="sm:w-4 sm:h-4 group-hover:-translate-x-1 transition-transform" />
                         </button>
 
-                        <div className="text-center flex-1">
-                            <div className="text-[8px] font-bold uppercase tracking-[0.3em] text-[var(--accent-primary)] mb-0.5 opacity-60">O'rganish</div>
-                            <div className="text-xs font-bold uppercase tracking-tight opacity-40 italic truncate px-2">{topicName}</div>
+                        <div className="text-center flex-1 min-w-0">
+                            <div className="text-[7px] sm:text-[8px] font-bold uppercase tracking-[0.3em] text-[var(--accent-primary)] mb-0.5 opacity-60">O'rganish</div>
+                            <div className="text-[10px] sm:text-xs font-bold uppercase tracking-tight opacity-40 italic truncate px-2">{topicName}</div>
                         </div>
 
-                        <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-lg border border-white/5">
-                            <span className="text-[9px] font-bold text-[var(--text-primary)] tabular-nums">
+                        <div className="flex items-center gap-2 bg-white/5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-white/5 flex-shrink-0">
+                            <span className="text-[8px] sm:text-[9px] font-bold text-[var(--text-primary)] tabular-nums whitespace-nowrap">
                                 {currentItemIndex + 1} <span className="opacity-20 mx-0.5">/</span> {items.length}
                             </span>
                         </div>
                     </div>
 
-                    {/* Content Area - Reversed: Image Left, Dictionary Right */}
-                    <div className="min-h-[350px] grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+                    {/* Content Area - Responsive Grid */}
+                    <div className="min-h-[280px] sm:min-h-[350px] grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-center">
                         {/* Image Section - LEFT Column */}
                         <AnimatePresence mode="wait">
                             {currentItem.image ? (
