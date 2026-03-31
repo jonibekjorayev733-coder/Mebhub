@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { login as loginWithEmail, googleLogin } from '../utils/authService';
+import { login as loginWithEmail } from '../utils/authService';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -10,7 +10,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const googleInitialized = useRef(false);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -18,66 +17,6 @@ export default function LoginPage() {
       navigate('/home');
     }
   }, [user, navigate]);
-
-  // Initialize Google Sign-In (works with any host/port)
-  useEffect(() => {
-    if (googleInitialized.current) return;
-    googleInitialized.current = true;
-
-    // Only initialize if VITE_GOOGLE_CLIENT_ID is configured
-    if (!import.meta.env.VITE_GOOGLE_CLIENT_ID) {
-      console.warn('Google OAuth not configured - VITE_GOOGLE_CLIENT_ID is missing');
-      return;
-    }
-
-    const initializeGoogle = () => {
-      if (window.google && window.google.accounts) {
-        // Initialize without hosted_domain to work from any origin
-        window.google.accounts.id.initialize({
-          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-          callback: handleGoogleResponse,
-          ux_mode: 'popup', // Use popup instead of redirect to avoid origin mismatch
-        });
-
-        const buttonDiv = document.getElementById('google-signin-button');
-        if (buttonDiv) {
-          window.google.accounts.id.renderButton(buttonDiv, {
-            type: 'standard',
-            size: 'large',
-            locale: 'en',
-            theme: 'outline',
-          });
-        }
-      }
-    };
-
-    const timer = setTimeout(initializeGoogle, 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const handleGoogleResponse = async (response: any) => {
-    try {
-      setLoading(true);
-      setError('');
-      
-      const credential = response.credential;
-      
-      // Send to backend
-      const authResponse = await googleLogin(credential);
-      
-      if (authResponse) {
-        login(authResponse.access_token, authResponse.user);
-        navigate('/home');
-      } else {
-        setError('Google login failed');
-      }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred during Google login');
-      console.error('Google login error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -168,29 +107,6 @@ export default function LoginPage() {
               {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
-
-          {/* Divider */}
-          <div className="flex items-center my-6">
-            <div className="flex-1 h-px bg-slate-700/50"></div>
-            <span className="px-3 text-slate-400 text-sm">yoki</span>
-            <div className="flex-1 h-px bg-slate-700/50"></div>
-          </div>
-
-          {/* Google Login Button */}
-          <div 
-            id="google-signin-button" 
-            className="w-full flex justify-center"
-            style={{ minHeight: "48px" }}
-          ></div>
-
-          {/* Google Not Configured Warning */}
-          {!import.meta.env.VITE_GOOGLE_CLIENT_ID && (
-            <div className="mt-4 p-3 bg-yellow-500/20 border border-yellow-500/30 rounded-lg">
-              <p className="text-yellow-400 text-xs text-center">
-                Google OAuth configured emas - Emailni ishlatib kirish mumkin
-              </p>
-            </div>
-          )}
 
           {/* Info Section */}
           <div className="text-center mt-8">
