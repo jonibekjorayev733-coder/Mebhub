@@ -3,7 +3,8 @@
  * Handles API calls to backend for login, register, and Google OAuth
  */
 
-const API_BASE_URL = "http://127.0.0.1:8000";
+// Get API base URL from environment or use default
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
 
 export interface LoginCredentials {
   email: string;
