@@ -1,10 +1,36 @@
 /**
  * Authentication Service
  * Handles API calls to backend for login, register, and Google OAuth
+ * 
+ * Supports three environments:
+ * 1. Local development: localhost:5173 → localhost:8000 (direct + proxy)
+ * 2. Mobile/ngrok: ngrok-frontend → ngrok-backend (must configure VITE_API_BASE_URL)
+ * 3. Production: domain → api.domain
  */
 
-// Get API base URL from environment or use default
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+// Get API base URL - smart detection for different environments
+function getAPIBaseURL(): string {
+  const envURL = import.meta.env.VITE_API_BASE_URL;
+  
+  // If explicitly configured in .env, use it (for ngrok or production)
+  if (envURL) {
+    console.debug('[AuthService] Using configured API URL:', envURL);
+    return envURL;
+  }
+  
+  // For localhost development, use direct localhost
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    console.debug('[AuthService] Using localhost API URL');
+    return 'http://127.0.0.1:8000';
+  }
+  
+  // For ngrok or other domains without explicit config, use same origin with /api prefix
+  // This expects a reverse proxy or the backend to be on the same domain
+  console.warn('[AuthService] Using same-origin API calls. If using ngrok, please set VITE_API_BASE_URL in .env');
+  return '';
+}
+
+const API_BASE_URL = getAPIBaseURL();
 
 export interface LoginCredentials {
   email: string;
