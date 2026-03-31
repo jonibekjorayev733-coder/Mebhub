@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Book, GraduationCap, Mail, Phone, MapPin, X, Moon, Sun, LogOut } from 'lucide-react';
+import { Book, GraduationCap, Mail, Phone, MapPin, X, Moon, Sun, LogOut, User, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMedicalStore } from '../store/useMedicalStore';
 import { useAuth } from '@/context/AuthContext';
@@ -7,10 +7,11 @@ import { useAuth } from '@/context/AuthContext';
 interface LayoutProps {
     children: React.ReactNode;
     onStart?: () => void;
+    onProfile?: () => void;
     hideHeaderFooter?: boolean;
 }
 
-export const MainLayout: React.FC<LayoutProps> = ({ children, onStart, hideHeaderFooter }) => {
+export const MainLayout: React.FC<LayoutProps> = ({ children, onStart, onProfile, hideHeaderFooter }) => {
     const { isDarkMode } = useMedicalStore();
 
     return (
@@ -19,7 +20,7 @@ export const MainLayout: React.FC<LayoutProps> = ({ children, onStart, hideHeade
             <div className="fixed top-[-10%] right-[-5%] w-[40vw] h-[40vw] bg-[var(--accent-primary)]/5 rounded-full blur-[120px] pointer-events-none animate-magnetic" />
             <div className="fixed bottom-[-10%] left-[-5%] w-[35vw] h-[35vw] bg-[var(--accent-secondary)]/5 rounded-full blur-[100px] pointer-events-none animate-ether" />
 
-            {!hideHeaderFooter && <Header onStart={onStart} />}
+            {!hideHeaderFooter && <Header onStart={onStart} onProfile={onProfile} />}
             <main className={`relative z-10 w-full overflow-x-hidden ${hideHeaderFooter ? '' : 'pt-20 md:pt-28'}`}>
                 {children}
             </main>
@@ -28,8 +29,9 @@ export const MainLayout: React.FC<LayoutProps> = ({ children, onStart, hideHeade
     );
 };
 
-const Header: React.FC<{ onStart?: () => void }> = ({ onStart }) => {
+const Header: React.FC<{ onStart?: () => void; onProfile?: () => void }> = ({ onStart, onProfile }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
     const { isDarkMode, toggleDarkMode } = useMedicalStore();
     const { user, logout } = useAuth();
     const navigate = useNavigate();
@@ -93,8 +95,86 @@ const Header: React.FC<{ onStart?: () => void }> = ({ onStart }) => {
 
                     {user ? (
                         <>
-                            <div className="hidden md:flex items-center gap-3 px-4 py-2 rounded-xl bg-white/5 border border-white/10">
-                                <span className="text-xs font-semibold text-white/70 truncate max-w-[150px]">{user.email}</span>
+                            <div className="relative">
+                                <button
+                                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                                    className="hidden md:flex items-center gap-3 px-3 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
+                                    title="Profil menyusi"
+                                >
+                                    {user.avatar ? (
+                                        <img 
+                                            src={user.avatar} 
+                                            alt={user.full_name || user.email}
+                                            className="w-8 h-8 rounded-lg object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-8 h-8 rounded-lg bg-[var(--accent-primary)] flex items-center justify-center text-[var(--btn-text)] font-bold text-sm">
+                                            {(user.full_name || user.email)[0]?.toUpperCase()}
+                                        </div>
+                                    )}
+                                    <span className="text-xs font-semibold text-white/70 truncate max-w-[100px]">
+                                        {user.full_name || user.email}
+                                    </span>
+                                </button>
+
+                                {/* Profile Dropdown */}
+                                {isProfileOpen && (
+                                    <div className="absolute right-0 top-full mt-2 w-56 glass-card-ultra !rounded-xl border border-[var(--glass-border)] bg-[var(--bg-surface)] z-[100] overflow-hidden shadow-xl">
+                                        <div className="p-4 border-b border-white/10">
+                                            <div className="flex items-center gap-3 mb-3">
+                                                {user.avatar ? (
+                                                    <img 
+                                                        src={user.avatar} 
+                                                        alt={user.full_name || user.email}
+                                                        className="w-12 h-12 rounded-lg object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="w-12 h-12 rounded-lg bg-[var(--accent-primary)] flex items-center justify-center text-[var(--btn-text)] font-bold text-xl">
+                                                        {(user.full_name || user.email)[0]?.toUpperCase()}
+                                                    </div>
+                                                )}
+                                                <div className="flex-1">
+                                                    <p className="text-sm font-bold text-white">{user.full_name || 'Foydalanuvchi'}</p>
+                                                    <p className="text-xs text-white/50">{user.email}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="py-2">
+                                            <button
+                                                onClick={() => {
+                                                    if (onProfile) {
+                                                        onProfile();
+                                                    }
+                                                    setIsProfileOpen(false);
+                                                }}
+                                                className="w-full px-4 py-2.5 text-left text-sm font-semibold text-white/90 hover:bg-white/10 flex items-center gap-2 transition-all"
+                                            >
+                                                <User size={16} />
+                                                Profil
+                                            </button>
+                                            {(user as any).is_admin && (
+                                                <button
+                                                    onClick={() => {
+                                                        navigate('/admin');
+                                                        setIsProfileOpen(false);
+                                                    }}
+                                                    className="w-full px-4 py-2.5 text-left text-sm font-semibold text-purple-400 hover:bg-white/10 flex items-center gap-2 transition-all"
+                                                >
+                                                    <Settings size={16} />
+                                                    Admin Panel
+                                                </button>
+                                            )}
+                                            <button
+                                                onClick={handleLogout}
+                                                className="w-full px-4 py-2.5 text-left text-sm font-semibold text-red-400 hover:bg-white/10 flex items-center gap-2 transition-all border-t border-white/10"
+                                            >
+                                                <LogOut size={16} />
+                                                Chiqish
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                             {(user as any).is_admin && (
                                 <button
@@ -104,13 +184,6 @@ const Header: React.FC<{ onStart?: () => void }> = ({ onStart }) => {
                                     ⚙️ ADMIN
                                 </button>
                             )}
-                            <button
-                                onClick={handleLogout}
-                                className="hidden md:flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-black px-4 py-2.5 rounded-xl text-[10px] tracking-widest uppercase transition-all shadow-[0_0_20px_rgba(255,107,0,0.2)]"
-                            >
-                                <LogOut size={16} />
-                                CHIQISH
-                            </button>
                         </>
                     ) : (
                         <button

@@ -51,7 +51,7 @@ async def get_all_topics(db: Session = Depends(get_db)):
     GET /learning/topics
     """
     try:
-        topics = db.query(MedicalTopic).order_by(MedicalTopic.order).all()
+        topics = db.query(MedicalTopic).order_by(MedicalTopic.id.desc()).all()
         return topics
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -66,7 +66,7 @@ async def get_learning_items(topic_id: int, db: Session = Depends(get_db)):
     try:
         items = db.query(LearningItem).filter(
             LearningItem.topic_id == topic_id
-        ).order_by(LearningItem.order).all()
+        ).order_by(LearningItem.id.desc()).all()
         
         if not items:
             return []
@@ -85,7 +85,7 @@ async def get_test_questions(topic_id: int, db: Session = Depends(get_db)):
     try:
         questions = db.query(TestQuestion).filter(
             TestQuestion.topic_id == topic_id
-        ).order_by(TestQuestion.order).all()
+        ).order_by(TestQuestion.id.desc()).all()
         
         if not questions:
             return []

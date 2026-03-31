@@ -24,11 +24,17 @@ export default function LoginPage() {
     if (googleInitialized.current) return;
     googleInitialized.current = true;
 
+    // Only initialize if VITE_GOOGLE_CLIENT_ID is configured
+    if (!import.meta.env.VITE_GOOGLE_CLIENT_ID) {
+      console.warn('Google OAuth not configured - VITE_GOOGLE_CLIENT_ID is missing');
+      return;
+    }
+
     const initializeGoogle = () => {
       if (window.google && window.google.accounts) {
         // Initialize without hosted_domain to work from any origin
         window.google.accounts.id.initialize({
-          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || 'dummy',
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
           callback: handleGoogleResponse,
           ux_mode: 'popup', // Use popup instead of redirect to avoid origin mismatch
         });
@@ -166,7 +172,7 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="flex items-center my-6">
             <div className="flex-1 h-px bg-slate-700/50"></div>
-            <span className="px-3 text-slate-400 text-sm">or</span>
+            <span className="px-3 text-slate-400 text-sm">yoki</span>
             <div className="flex-1 h-px bg-slate-700/50"></div>
           </div>
 
@@ -177,10 +183,28 @@ export default function LoginPage() {
             style={{ minHeight: "48px" }}
           ></div>
 
+          {/* Google Not Configured Warning */}
+          {!import.meta.env.VITE_GOOGLE_CLIENT_ID && (
+            <div className="mt-4 p-3 bg-yellow-500/20 border border-yellow-500/30 rounded-lg">
+              <p className="text-yellow-400 text-xs text-center">
+                Google OAuth configured emas - Emailni ishlatib kirish mumkin
+              </p>
+            </div>
+          )}
+
           {/* Info Section */}
           <div className="text-center mt-8">
-            <p className="text-slate-400 text-sm">
+            <p className="text-slate-400 text-sm mb-4">
               Don't have an account?{' '}
+              <a
+                href="/register"
+                className="text-cyan-400 hover:text-cyan-300 font-semibold transition"
+              >
+                Sign Up
+              </a>
+            </p>
+            <p className="text-slate-400 text-sm">
+              Or{' '}
               <button
                 onClick={() => {
                   setEmail('demo@example.com');

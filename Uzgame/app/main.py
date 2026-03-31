@@ -4,12 +4,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from app.database import engine, get_db, Base, sessionLocal
 from app.database_users import users_engine, UsersBase, init_users_db
-from app.models.base import User as UserModel, Med, Game as GameModel, TestSet, Question, Option, Score, MultiplayerRoom
+from app.models.base import User as UserModel, Med, Game as GameModel, TestSet, Question, Option, Score, MultiplayerRoom, AdminRole
 from app.models.medical import MedicalTopic, LearningItem, TestQuestion
 from app.schemas.userschemas import UserCreate, User as UserSchema, Token
 from app.auth.auth import authenticate_user, create_access_token, get_password_hash, get_current_user, \
     ACCESS_TOKEN_EXPIRE_MINUTES
-from app.routers import auth, user_accounts, emailuser_router, learning, admin
+from app.routers import auth, user_accounts, emailuser_router, learning, admin, certificate
 from datetime import timedelta
 import logging
 
@@ -34,6 +34,9 @@ try:
         items_count = db.query(LearningItem).count()
         questions_count = db.query(TestQuestion).count()
         logger.info(f"✓ Medical tables: {topics_count} topics, {items_count} items, {questions_count} questions")
+        # Check admin roles
+        admin_roles_count = db.query(AdminRole).count()
+        logger.info(f"✓ Admin roles table: {admin_roles_count} admin roles")
 except Exception as e:
     logger.error(f"Startup error (med database): {e}")
 
@@ -64,6 +67,7 @@ app.include_router(user_accounts.router)
 app.include_router(emailuser_router.router)
 app.include_router(learning.router)
 app.include_router(admin.router)
+app.include_router(certificate.router)
 
 @app.get("/health")
 def health_check():

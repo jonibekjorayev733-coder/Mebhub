@@ -57,7 +57,7 @@ export default function AdminPanel() {
   const fetchStats = async () => {
     try {
       const token = localStorage.getItem('auth_token');
-      const response = await fetch('http://localhost:8000/admin/stats', {
+      const response = await fetch('/admin/stats', {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.ok) {
@@ -79,7 +79,7 @@ export default function AdminPanel() {
     setLoading(true);
     try {
       const token = localStorage.getItem('auth_token');
-      const response = await fetch('http://localhost:8000/admin/topics', {
+      const response = await fetch('/admin/topics', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -146,8 +146,8 @@ export default function AdminPanel() {
         {/* Logo */}
         <div className="sidebar-header">
           <div className="logo">
-            <span className="logo-icon">🏥</span>
-            {isExpanded && <span className="logo-text">Medical Hub</span>}
+            <span className="logo-icon"></span>
+            {isExpanded && <span className="logo-text">admin  panel</span>}
           </div>
         </div>
 

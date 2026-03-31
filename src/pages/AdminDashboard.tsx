@@ -28,7 +28,7 @@ const StatCard = ({ icon: Icon, label, value, trend, trendColor }: any) => (
 );
 
 const AdminDashboard: React.FC = () => {
-  const { token, isLoading: authLoading } = useAuth();
+  const { token, isLoading: authLoading, logout } = useAuth();
   const [stats, setStats] = useState<Stats>({
     total_topics: 0,
     total_items: 0,
@@ -59,6 +59,7 @@ const AdminDashboard: React.FC = () => {
           setLoading(false);
         } else if (response.status === 401) {
           console.error("Unauthorized: Token invalid or user not admin");
+          logout();
           setLoading(false);
         } else {
           throw new Error(`HTTP ${response.status}`);

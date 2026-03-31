@@ -3,7 +3,7 @@
  * Handles API calls to backend for login, register, and Google OAuth
  */
 
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "http://127.0.0.1:8000";
 
 export interface LoginCredentials {
   email: string;
@@ -45,6 +45,7 @@ export interface User {
   provider: "email" | "google";
   google_id: string | null;
   profile_picture: string | null;
+  avatar?: string | null;
   created_at: string;
   updated_at: string | null;
 }
@@ -125,7 +126,12 @@ export async function getCurrentUser(token: string): Promise<User> {
     throw new Error("Failed to get current user");
   }
 
-  return response.json();
+  const user = await response.json();
+  // Map profile_picture to avatar for consistency
+  if (user.profile_picture && !user.avatar) {
+    user.avatar = user.profile_picture;
+  }
+  return user;
 }
 
 /**

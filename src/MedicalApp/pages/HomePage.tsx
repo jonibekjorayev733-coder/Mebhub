@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { topics as mockTopics } from '../data/mockData';
 import { NeonButton } from '../components/UIElements';
 import { useMedicalStore } from '../store/useMedicalStore';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, CheckCircle2 } from 'lucide-react';
 
 interface DatabaseTopic {
     id: number;
@@ -93,18 +93,35 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTopic, isEmbedded = 
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-16">
-                    {topics.map((topic, index) => (
+                    {topics.map((topic, index) => {
+                        const isCompleted = testedRules[topic.id];
+                        return (
                         <motion.div
                             key={topic.id}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.1 }}
                             onClick={() => onSelectTopic(topic.id)}
-                            className="h-full flex flex-col justify-between group !p-5 glass-card-ultra cursor-pointer border-[var(--glass-border)] bg-[var(--bg-surface)] hover:scale-[1.02]"
+                            className={`h-full flex flex-col justify-between group !p-5 glass-card-ultra cursor-pointer transition-all relative ${
+                                isCompleted 
+                                    ? 'border-[var(--accent-primary)]/30 bg-[var(--accent-primary)]/4 hover:scale-[1.02]' 
+                                    : 'border-[var(--glass-border)] bg-[var(--bg-surface)] hover:scale-[1.02]'
+                            }`}
                         >
+                            {/* Completion Badge */}
+                            {isCompleted && (
+                                <div className="absolute -top-3 -right-3 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-lg border-2 border-[var(--bg-primary)] animate-pulse">
+                                    <CheckCircle2 size={16} className="text-white" />
+                                </div>
+                            )}
+                            
                             <div className="relative">
-                                <div className="w-11 h-11 rounded-lg bg-[var(--accent-primary)]/5 flex items-center justify-center text-[var(--accent-primary)] font-bold text-xl mb-5 group-hover:bg-[var(--accent-primary)] group-hover:text-[var(--btn-text)] transition-all border border-[var(--glass-border)]">
-                                    {String.fromCharCode(65 + (index % 26))}
+                                <div className={`w-11 h-11 rounded-lg flex items-center justify-center text-xl mb-5 transition-all border ${
+                                    isCompleted
+                                        ? 'bg-green-500/20 text-green-500 border-green-500/30'
+                                        : 'bg-[var(--accent-primary)]/5 text-[var(--accent-primary)] border-[var(--glass-border)] group-hover:bg-[var(--accent-primary)] group-hover:text-[var(--btn-text)]'
+                                } font-bold`}>
+                                    {isCompleted ? <CheckCircle2 size={20} /> : String.fromCharCode(65 + (index % 26))}
                                 </div>
                                 <h3 className="text-lg font-bold mb-2 uppercase tracking-tight text-[var(--text-primary)]">
                                     {topic.name}
@@ -115,14 +132,19 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTopic, isEmbedded = 
                             </div>
                             <div className="flex items-center justify-between pt-4 border-t border-[var(--glass-border)] opacity-60 group-hover:opacity-100 transition-all">
                                 <div className="text-[8px] font-bold text-[var(--accent-primary)] uppercase tracking-widest">
-                                    O'RGA
+                                    {isCompleted ? '✓ TAMOM' : 'O\'RGA'}
                                 </div>
-                                <div className="w-8 h-8 rounded-full border border-[var(--glass-border)] flex items-center justify-center group-hover:bg-[var(--accent-primary)] group-hover:text-[var(--btn-text)] transition-all">
+                                <div className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all ${
+                                    isCompleted
+                                        ? 'border-green-500/50 bg-green-500/10 text-green-500'
+                                        : 'border-[var(--glass-border)] group-hover:bg-[var(--accent-primary)] group-hover:text-[var(--btn-text)]'
+                                }`}>
                                     <ChevronRight size={16} />
                                 </div>
                             </div>
                         </motion.div>
-                    ))}
+                        );
+                    })}
                 </div>
             )}
         </div >

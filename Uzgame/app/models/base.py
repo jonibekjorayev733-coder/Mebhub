@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
 
@@ -18,7 +19,7 @@ class Med(Base):
     google_id = Column(String(255), unique=True, index=True, nullable=True)
     google_email = Column(String(255), nullable=True)
     provider = Column(String(50), default="email")  # "email" yoki "google"
-    profile_picture = Column(String(500), nullable=True)
+    profile_picture = Column(Text, nullable=True)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
@@ -100,3 +101,19 @@ class MultiplayerRoom(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     room_name = Column(String(255))
+
+
+class AdminRole(Base):
+    """Admin role and permissions table"""
+    __tablename__ = "admin_roles"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("med.id"), nullable=False)
+    email = Column(String(255), nullable=False, index=True)
+    role = Column(String(50), default="admin")  # admin, moderator, editor
+    permissions = Column(String(500), nullable=True)  # comma-separated: "manage_topics,manage_users,manage_admins"
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    # Relationship to Med table
+    user = relationship("Med", foreign_keys=[user_id])

@@ -56,9 +56,7 @@ Base = declarative_base()
 
 def get_db():
     db = sessionLocal()
-    logger.debug(f"[DATABASE] get_db() created session: {id(db)}, Connection: {db.connection()}")
     try:
         yield db
     finally:
-        logger.debug(f"[DATABASE] get_db() closing session: {id(db)}")
         db.close()

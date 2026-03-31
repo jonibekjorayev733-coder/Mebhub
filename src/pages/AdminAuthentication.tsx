@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Lock, Mail, User, Trash2, Plus, Shield, AlertCircle } from "lucide-react";
+import ConfirmModal from "../components/ConfirmModal";
 
 interface AuthUser {
   id: number;
@@ -11,10 +12,11 @@ interface AuthUser {
 }
 
 const AdminAuthentication: React.FC = () => {
-  const { token } = useAuth();
+  const { token, logout } = useAuth();
   const [users, setUsers] = useState<AuthUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [confirmModal, setConfirmModal] = useState<{ type: string; id?: number } | null>(null);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -23,14 +25,23 @@ const AdminAuthentication: React.FC = () => {
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
     fetchUsers();
-    // Real-time polling - har 2 sekundda yangilash
-    const interval = setInterval(fetchUsers, 2000);
+
+    const interval = setInterval(() => {
+      fetchUsers();
+    }, 2000);
+
     return () => clearInterval(interval);
   }, [token]);
 
   const fetchUsers = async () => {
     if (!token) return;
+
     try {
       const response = await fetch("http://127.0.0.1:8000/admin/users", {
         headers: {
@@ -38,9 +49,14 @@ const AdminAuthentication: React.FC = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+
       if (response.ok) {
         const data = await response.json();
         setUsers(data);
+        setMessage(null);
+      } else if (response.status === 401) {
+        setMessage({ type: "error", text: "Sessiya tugagan. Qayta login qiling." });
+        logout();
       }
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -73,6 +89,9 @@ const AdminAuthentication: React.FC = () => {
         setMessage({ type: "success", text: `✅ Admin "${data.email}" muvaffaqiyatli qo'shildi!` });
         setTimeout(() => setMessage(null), 3000);
         fetchUsers();
+      } else if (response.status === 401) {
+        setMessage({ type: "error", text: "Sessiya tugagan. Qayta login qiling." });
+        logout();
       } else {
         const error = await response.json();
         setMessage({ type: "error", text: `❌ Xato: ${error.detail}` });
@@ -100,6 +119,9 @@ const AdminAuthentication: React.FC = () => {
         setMessage({ type: "success", text: `✅ "${data.email}" adminlikka ko'tarildi!` });
         setTimeout(() => setMessage(null), 3000);
         fetchUsers();
+      } else if (response.status === 401) {
+        setMessage({ type: "error", text: "Sessiya tugagan. Qayta login qiling." });
+        logout();
       }
     } catch (error) {
       console.error("Error making admin:", error);
@@ -124,6 +146,9 @@ const AdminAuthentication: React.FC = () => {
         setMessage({ type: "success", text: `✅ "${data.email}" adminlikdan olib tashlandi!` });
         setTimeout(() => setMessage(null), 3000);
         fetchUsers();
+      } else if (response.status === 401) {
+        setMessage({ type: "error", text: "Sessiya tugagan. Qayta login qiling." });
+        logout();
       }
     } catch (error) {
       console.error("Error removing admin:", error);
@@ -131,8 +156,12 @@ const AdminAuthentication: React.FC = () => {
     }
   };
 
-  const handleDeleteUser = async (id: number) => {
-    if (!token || !window.confirm("Bu foydalanuvchini o'chirishni tasdiqlang?")) return;
+  const handleDeleteUser = (id: number) => {
+    setConfirmModal({ type: "deleteUser", id });
+  };
+
+  const confirmDeleteUser = async (id: number) => {
+    if (!token) return;
 
     try {
       const response = await fetch(`http://127.0.0.1:8000/admin/users/${id}`, {
@@ -147,11 +176,16 @@ const AdminAuthentication: React.FC = () => {
         setMessage({ type: "success", text: "✅ Foydalanuvchi o'chirildi!" });
         setTimeout(() => setMessage(null), 3000);
         fetchUsers();
+        setConfirmModal(null);
       }
     } catch (error) {
       console.error("Error deleting user:", error);
       setMessage({ type: "error", text: "Foydalanuvchi o'chirishda xato bo'ldi" });
     }
+  };
+
+  const handleLogout = () => {
+    setConfirmModal({ type: "logout" });
   };
 
   return (
@@ -391,6 +425,41 @@ const AdminAuthentication: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Logout Button */}
+      <div className="mt-8 flex justify-end">
+        <button
+          onClick={handleLogout}
+          className="px-6 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl font-semibold border border-red-500/30 transition-all"
+        >
+          Chiqish
+        </button>
+      </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmModal
+        isOpen={!!confirmModal}
+        title={
+          confirmModal?.type === "deleteUser"
+            ? "Foydalanuvchini o'chirish"
+            : "Chiqish"
+        }
+        message={
+          confirmModal?.type === "deleteUser"
+            ? "Siz bu foydalanuvchini o'chirmoqchisiz? Bu amalni qaytara olmaysiz!"
+            : "Buday tizimdan chiqmoqchisiz?"
+        }
+        confirmText={confirmModal?.type === "logout" ? "Chiqish" : "O'chirish"}
+        confirmVariant={confirmModal?.type === "logout" ? "warning" : "danger"}
+        onCancel={() => setConfirmModal(null)}
+        onConfirm={() => {
+          if (confirmModal?.type === "deleteUser" && confirmModal.id) {
+            confirmDeleteUser(confirmModal.id);
+          } else if (confirmModal?.type === "logout") {
+            logout();
+          }
+        }}
+      />
     </div>
   );
 };

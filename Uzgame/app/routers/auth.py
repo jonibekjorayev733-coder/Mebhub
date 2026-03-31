@@ -13,11 +13,17 @@ from app.auth.auth import (
     get_or_create_user_from_google
 )
 from app.core.google_oauth import verify_google_token
+from pydantic import BaseModel
 import logging
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
+
+
+class ProfileUpdate(BaseModel):
+    full_name: str | None = None
+    profile_picture: str | None = None
 
 
 @router.post("/register", response_model=MedSchema)
@@ -33,8 +39,7 @@ async def register(med: MedCreate, db: Session = Depends(get_db)):
             detail="Email allaqachon ro'yxatdan o'tgan"
         )
     
-    # DEBUG: Log which database
-    logger.info(f"[REGISTER] Using DB: {db.get_bind().url if hasattr(db, 'get_bind') else 'unknown'}")
+    logger.info(f"[REGISTER] New register attempt: {med.email}")
     
     # Yangi user yaratish
     hashed_password = get_password_hash(med.password)
@@ -56,21 +61,25 @@ async def register(med: MedCreate, db: Session = Depends(get_db)):
         # EMAILUSER TABLE-GA SYNC QIL
         from app.models.emailuser_model import EmailUser
         
-        existing = db.query(EmailUser).filter(EmailUser.email == med.email).first()
-        if not existing:
-            emailuser = EmailUser(
-                email=med.email,
-                password=hashed_password,
-                full_name=med.full_name
-            )
-            db.add(emailuser)
-            db.flush()
-            db.commit()
-            logger.info(f"✓ User synced to emailuser table: {med.email}")
+        try:
+            existing = db.query(EmailUser).filter(EmailUser.email == med.email).first()
+            if not existing:
+                emailuser = EmailUser(
+                    email=med.email,
+                    password=hashed_password,
+                    full_name=med.full_name
+                )
+                db.add(emailuser)
+                db.commit()
+                logger.info(f"✓ User synced to emailuser table: {med.email}")
+        except Exception as e:
+            logger.error(f"Warning: Could not sync to emailuser table: {str(e)}")
+            db.rollback()
+            # Don't fail registration if emailuser sync fails
         
         # CRITICAL: Explicit refresh to pull latest from database
         db.refresh(db_user)
-        logger.info(f"REGISTERED: {db_user.email} (ID={db_user.id}) - synced to both tables")
+        logger.info(f"✓ REGISTERED: {db_user.email} (ID={db_user.id})")
         
         return db_user
         
@@ -94,9 +103,12 @@ async def login(med: MedLogin, db: Session = Depends(get_db)):
     
     Returns: JWT access token
     """
+    logger.info(f"[LOGIN] Login request received for: {med.email}")
     # Foydalanuvchini authenticate qilish
     user = authenticate_user(db, med.email, med.password)
+    logger.info(f"[LOGIN] Authentication result: {user}, type: {type(user)}, bool: {bool(user)}")
     if not user:
+        logger.warning(f"[LOGIN] Authentication failed for {med.email}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email yoki parol noto'g'ri",
@@ -154,12 +166,11 @@ async def google_login(request: GoogleLoginRequest, db: Session = Depends(get_db
                 full_name=user.full_name
             )
             db.add(emailuser)
-            db.flush()
             db.commit()
             logger.info(f"✓ Google user synced to emailuser table: {user.email}")
     except Exception as e:
+        logger.warning(f"Could not sync Google user to emailuser table: {str(e)}")
         db.rollback()
-        logger.error(f"ERROR syncing Google user: {str(e)}")
         # Don't fail login if sync fails
     
     # Backend access token yaratish
@@ -169,7 +180,7 @@ async def google_login(request: GoogleLoginRequest, db: Session = Depends(get_db
         expires_delta=access_token_expires
     )
     
-    logger.info(f"Google login SUCCESS: {user.email}")
+    logger.info(f"✓ Google login SUCCESS: {user.email}")
     return {
         "access_token": access_token,
         "token_type": "bearer",
@@ -196,18 +207,50 @@ async def logout(current_user: Med = Depends(get_current_active_user)):
 
 @router.put("/profile", response_model=MedSchema)
 async def update_profile(
-    full_name: str = None,
+    profile_data: ProfileUpdate,
     current_user: Med = Depends(get_current_active_user),
     db: Session = Depends(get_db)
 ):
     """
     Profil ma'lumotlarini yangilash
     """
-    if full_name:
-        current_user.full_name = full_name
+    try:
+        # Update Med table
+        if profile_data.full_name:
+            current_user.full_name = profile_data.full_name
+        
+        if profile_data.profile_picture:
+            current_user.profile_picture = profile_data.profile_picture
+        
         db.commit()
         db.refresh(current_user)
+        logger.info(f"✓ Updated Med profile: {current_user.email}")
+        
+        # EmailUser table'ga ham sync qilish
+        from app.models.emailuser_model import EmailUser
+        try:
+            emailuser = db.query(EmailUser).filter(EmailUser.email == current_user.email).first()
+            if emailuser:
+                if profile_data.full_name:
+                    emailuser.full_name = profile_data.full_name
+                if profile_data.profile_picture:
+                    emailuser.profile_picture = profile_data.profile_picture
+                db.commit()
+                db.refresh(emailuser)
+                logger.info(f"✓ Synced EmailUser profile: {current_user.email}")
+        except Exception as e:
+            logger.error(f"Error syncing EmailUser profile: {str(e)}")
+            # Don't fail the request if EmailUser sync fails
+        
         logger.info(f"Profile updated: {current_user.email}")
-    
-    return current_user
+        return current_user
+        
+    except Exception as e:
+        logger.error(f"Error updating profile: {str(e)}")
+        logger.error(f"Error type: {type(e).__name__}")
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error updating profile: {str(e)}"
+        )
 

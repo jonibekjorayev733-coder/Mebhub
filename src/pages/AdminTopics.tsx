@@ -73,7 +73,7 @@ const AdminTopics: React.FC = () => {
         Authorization: `Bearer ${token}`,
       };
       
-      const response = await fetch("http://127.0.0.1:8000/admin/topics", {
+      const response = await fetch("/admin/topics", {
         method: "GET",
         headers: headers,
       });
@@ -125,7 +125,7 @@ const AdminTopics: React.FC = () => {
         Authorization: `Bearer ${token}`,
       };
 
-      const response = await fetch("http://127.0.0.1:8000/admin/topics", {
+      const response = await fetch("/admin/topics", {
         method: "POST",
         headers: headers,
         body: JSON.stringify(topicForm),
@@ -182,7 +182,7 @@ const AdminTopics: React.FC = () => {
         Authorization: `Bearer ${token}`,
       };
 
-      const response = await fetch("http://127.0.0.1:8000/admin/questions", {
+      const response = await fetch("/admin/questions", {
         method: "POST",
         headers: headers,
         body: JSON.stringify({
@@ -253,7 +253,7 @@ const AdminTopics: React.FC = () => {
         Authorization: `Bearer ${token}`,
       };
 
-      const response = await fetch("http://127.0.0.1:8000/admin/items", {
+      const response = await fetch("/admin/items", {
         method: "POST",
         headers: headers,
         body: JSON.stringify({

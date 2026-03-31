@@ -2,7 +2,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, XCircle, ChevronRight, Award, Trophy } from 'lucide-react';
 import { NeonButton } from '../components/UIElements';
-import { useMedicalStore } from '../store/useMedicalStore';
+import { useMedicalStore, CertificateData } from '../store/useMedicalStore';
+import { useAuth } from '../../context/AuthContext';
 
 interface TestQuestion {
     id: number;
@@ -10,13 +11,13 @@ interface TestQuestion {
     question_text: string;
     correct_answer: string;
     options: string[];
-    difficulty: string;
+    difficulty?: string;
 }
 
 interface TestModeProps {
     topicId: number;
     topicName: string;
-    onExit: () => void;
+    onExit: (showCertificate?: boolean) => void;
 }
 
 export const TestMode: React.FC<TestModeProps> = ({ topicId, topicName, onExit }) => {
@@ -28,16 +29,30 @@ export const TestMode: React.FC<TestModeProps> = ({ topicId, topicName, onExit }
     const [allQuestions, setAllQuestions] = useState<TestQuestion[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [totalTopics, setTotalTopics] = useState(0);
+
+    const { markRuleAsTested, markTopicAsCompleted, completedTopics, setCertificate, certificate } = useMedicalStore();
+    const { user } = useAuth();
 
     // Fetch test questions from API
     useEffect(() => {
-        const fetchQuestions = async () => {
+        const fetchData = async () => {
             try {
                 setLoading(true);
-                const response = await fetch(`/learning/topics/${topicId}/questions`);
-                if (!response.ok) throw new Error('Failed to fetch test questions');
-                const data = await response.json();
-                setAllQuestions(data);
+                const [questionsRes, topicsRes] = await Promise.all([
+                    fetch(`/learning/topics/${topicId}/questions`),
+                    fetch('/learning/topics')
+                ]);
+                
+                if (!questionsRes.ok) throw new Error('Failed to fetch test questions');
+                const questionsData = await questionsRes.json();
+                setAllQuestions(questionsData);
+                
+                if (topicsRes.ok) {
+                    const topicsData = await topicsRes.json();
+                    setTotalTopics(topicsData.length);
+                }
+                
                 setError(null);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Unknown error');
@@ -46,7 +61,7 @@ export const TestMode: React.FC<TestModeProps> = ({ topicId, topicName, onExit }
             }
         };
 
-        fetchQuestions();
+        fetchData();
     }, [topicId]);
 
     // Randomly pick 8 questions from the pool
@@ -55,8 +70,6 @@ export const TestMode: React.FC<TestModeProps> = ({ topicId, topicName, onExit }
         const shuffled = pool.sort(() => 0.5 - Math.random());
         return shuffled.slice(0, 8);
     }, [allQuestions]);
-
-    const { markRuleAsTested } = useMedicalStore();
 
     if (loading) {
         return (
@@ -99,26 +112,124 @@ export const TestMode: React.FC<TestModeProps> = ({ topicId, topicName, onExit }
 
         setIsAnswerChecked(true);
         const chosenOption = currentQuestion.options[selectedOption];
-        if (chosenOption === currentQuestion.correctAnswer) {
+        if (chosenOption === currentQuestion.correct_answer) {
             setScore(prev => prev + 1);
         }
     };
 
-    const handleNextQuestion = () => {
+    const handleNextQuestion = async () => {
         if (currentQuestionIndex + 1 < questions.length) {
             setCurrentQuestionIndex(prev => prev + 1);
             setSelectedOption(null);
             setIsAnswerChecked(false);
         } else {
+            // Mark the topic as completed with scores
             markRuleAsTested(topicId);
+            markTopicAsCompleted(topicId, score, questions.length);
+            
+            // Check if this was the last topic
+            // completedTopics will be updated in next render, so we calculate based on current state
+            const allCompletedTopics = { ...completedTopics, [topicId]: true };
+            const completedCount = Object.keys(allCompletedTopics).length;
+            
+            console.log(`[TEST] Topic ${topicId} test completed. Score: ${score}/${questions.length}`);
+            console.log(`[CHECK] Completed topics: ${completedCount}/${totalTopics}`, allCompletedTopics);
+            console.log(`[DEBUG] User: ${user?.id}, Total: ${totalTopics}, Valid: ${user && totalTopics > 0}`);
+            
+            // If all topics are completed, generate certificate
+            // We check completedCount === totalTopics, ensuring totalTopics is loaded (> 0)
+            const shouldGenerateCert = completedCount === totalTopics && user && totalTopics > 0;
+            
+            if (shouldGenerateCert) {
+                console.log('[CERT] Triggering certificate generation...');
+                
+                // Use setTimeout to ensure state updates are processed
+                setTimeout(async () => {
+                    try {
+                        const storeState = useMedicalStore.getState();
+                        console.log('[STORE] Current topicScores:', storeState.topicScores);
+                        
+                        // Calculate total scores across all topics
+                        let totalCorrect = 0;
+                        let totalQuestions = 0;
+                        
+                        // Sum all completed topic scores
+                        Object.entries(storeState.topicScores).forEach(([tId, scores]) => {
+                            totalCorrect += scores.correct;
+                            totalQuestions += scores.total;
+                            console.log(`  Topic ${tId}: ${scores.correct}/${scores.total}`);
+                        });
+                        
+                        const percentage = totalQuestions > 0 
+                            ? Math.round((totalCorrect / totalQuestions) * 100)
+                            : 0;
+                        
+                        console.log(`[STATS] Total: ${totalCorrect}/${totalQuestions} = ${percentage}%`);
+                        
+                        const certData = {
+                            user_id: user.id,
+                            full_name: user.full_name || 'User',
+                            email: user.email,
+                            profile_picture: user.avatar || user.profile_picture,
+                            total_topics: totalTopics,
+                            completed_topics: completedCount,
+                            total_questions: totalQuestions,
+                            correct_answers: totalCorrect
+                        };
+                        
+                        console.log('[API] Sending:', certData);
+                        
+                        const response = await fetch('/certificate/create', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                            },
+                            body: JSON.stringify(certData)
+                        });
+                        
+                        if (response.ok) {
+                            const cert = await response.json();
+                            setCertificate(cert);
+                            console.log('[SUCCESS] Certificate created:', cert);
+                        } else {
+                            const errText = await response.text();
+                            console.error('[ERROR] Status:', response.status, errText);
+                        }
+                    } catch (err) {
+                        console.error('[EXCEPTION]', err);
+                    }
+                }, 50);
+            } else {
+                const reasons = [];
+                if (completedCount !== totalTopics) reasons.push(`count ${completedCount} !== ${totalTopics}`);
+                if (!user) reasons.push('no user');
+                if (totalTopics === 0) reasons.push('topics not loaded (0)');
+                console.log(`[NO CERT] ${reasons.join(', ')}`);
+            }
+            
             setShowResults(true);
         }
     };
 
     if (showResults) {
         const percentage = Math.round((score / questions.length) * 100);
+        
         return (
             <div className="max-w-2xl mx-auto px-6 pt-12 pb-16 text-center">
+                {certificate && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-8 p-4 bg-gradient-to-r from-green-500/10 to-[var(--accent-primary)]/10 border border-green-500/20 rounded-xl"
+                    >
+                        <p className="text-sm font-bold text-green-500 uppercase tracking-widest mb-2">🎉 TEBRIKLAYMIZ! 🎉</p>
+                        <p className="text-[var(--text-muted)] text-xs mb-4">
+                            Siz barcha mavzularning testlarini yechib sertifikatni qo'ldingiz!
+                        </p>
+                    </motion.div>
+                )}
+                
                 <motion.div
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -148,7 +259,21 @@ export const TestMode: React.FC<TestModeProps> = ({ topicId, topicName, onExit }
                     </div>
                 </div>
 
-                <NeonButton onClick={onExit} className="w-full text-xs py-2.5">Bosqichlar</NeonButton>
+                {certificate ? (
+                    <div className="flex flex-col gap-3">
+                        <NeonButton onClick={() => onExit(true)} className="w-full text-xs py-2.5">
+                            Sertifikatni ko'rish
+                        </NeonButton>
+                        <button
+                            onClick={() => onExit()}
+                            className="w-full text-xs py-2.5 px-4 border border-[var(--glass-border)] hover:bg-[var(--glass-bg)] transition-colors rounded-lg text-[var(--text-muted)] font-bold uppercase tracking-widest"
+                        >
+                            Bosqichlar
+                        </button>
+                    </div>
+                ) : (
+                    <NeonButton onClick={onExit} className="w-full text-xs py-2.5">Bosqichlar</NeonButton>
+                )}
             </div>
         );
     }
@@ -201,8 +326,8 @@ export const TestMode: React.FC<TestModeProps> = ({ topicId, topicName, onExit }
                     <div className="grid grid-cols-1 gap-2 mb-6">
                         {currentQuestion.options.map((option, index) => {
                             const isSelected = selectedOption === index;
-                            const isCorrect = isAnswerChecked && option === currentQuestion.correctAnswer;
-                            const isWrong = isAnswerChecked && isSelected && option !== currentQuestion.correctAnswer;
+                            const isCorrect = isAnswerChecked && option === currentQuestion.correct_answer;
+                            const isWrong = isAnswerChecked && isSelected && option !== currentQuestion.correct_answer;
 
                             let borderClass = "border-[var(--glass-border)]/10";
                             let bgClass = "bg-[var(--glass-bg)]/5";
@@ -258,11 +383,11 @@ export const TestMode: React.FC<TestModeProps> = ({ topicId, topicName, onExit }
                                 animate={{ opacity: 1, y: 0 }}
                                 className="flex flex-col gap-3"
                             >
-                                <div className={`p-2.5 rounded-lg border text-center font-bold uppercase tracking-widest text-[8px] ${currentQuestion.options[selectedOption!] === currentQuestion.correctAnswer
+                                <div className={`p-2.5 rounded-lg border text-center font-bold uppercase tracking-widest text-[8px] ${currentQuestion.options[selectedOption!] === currentQuestion.correct_answer
                                     ? 'bg-green-500/10 border-green-500/20 text-green-500'
                                     : 'bg-red-500/10 border-red-500/20 text-red-500'
                                     }`}>
-                                    {currentQuestion.options[selectedOption!] === currentQuestion.correctAnswer
+                                    {currentQuestion.options[selectedOption!] === currentQuestion.correct_answer
                                         ? "To'g'ri!"
                                         : "Xato"}
                                 </div>

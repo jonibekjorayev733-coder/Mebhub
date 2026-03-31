@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Plus, Trash2, Edit2, BookOpen, HelpCircle, BarChart3, Save } from "lucide-react";
+import ConfirmModal from "../components/ConfirmModal";
 
 interface Topic {
   id: number;
@@ -26,16 +27,19 @@ interface TestQuestion {
 }
 
 const AdminTestAdd: React.FC = () => {
-  const { token } = useAuth();
+  const { token, logout } = useAuth();
   const [topics, setTopics] = useState<Topic[]>([]);
   const [activeTab, setActiveTab] = useState<"topics" | "learning" | "questions">("topics");
+  const [confirmModal, setConfirmModal] = useState<{ type: string; id?: number } | null>(null);
 
   // Topic Form
   const [showTopicForm, setShowTopicForm] = useState(false);
+  const [editingTopicId, setEditingTopicId] = useState<number | null>(null);
   const [topicForm, setTopicForm] = useState({ name: "", description: "" });
 
   // Learning Form
   const [showLearningForm, setShowLearningForm] = useState(false);
+  const [editingLearningId, setEditingLearningId] = useState<number | null>(null);
   const [learningForm, setLearningForm] = useState({
     topic_id: 0,
     latin_term: "",
@@ -45,6 +49,7 @@ const AdminTestAdd: React.FC = () => {
 
   // Question Form
   const [showQuestionForm, setShowQuestionForm] = useState(false);
+  const [editingQuestionId, setEditingQuestionId] = useState<number | null>(null);
   const [questionForm, setQuestionForm] = useState({
     topic_id: 0,
     question_text: "",
@@ -63,14 +68,16 @@ const AdminTestAdd: React.FC = () => {
   }, [token]);
 
   useEffect(() => {
+    if (!token) return;
+
     if (activeTab === "learning") fetchLearningItems();
     if (activeTab === "questions") fetchQuestions();
-  }, [activeTab]);
+  }, [activeTab, token]);
 
   const fetchTopics = async () => {
     if (!token) return;
     try {
-      const response = await fetch("http://127.0.0.1:8000/admin/topics", {
+      const response = await fetch("/admin/topics", {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -80,6 +87,9 @@ const AdminTestAdd: React.FC = () => {
         const data = await response.json();
         setTopics(data);
         console.log("✅ Topics loaded:", data);
+      } else if (response.status === 401) {
+        console.error("❌ Unauthorized topics request");
+        logout();
       } else {
         console.error("❌ Error fetching topics, status:", response.status);
       }
@@ -89,8 +99,10 @@ const AdminTestAdd: React.FC = () => {
   };
 
   const fetchLearningItems = async () => {
+    if (!token) return;
+
     try {
-      const response = await fetch("http://127.0.0.1:8000/admin/learning-items", {
+      const response = await fetch(`/admin/learning-items`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -98,6 +110,9 @@ const AdminTestAdd: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         setItems(data);
+      } else if (response.status === 401) {
+        console.error("❌ Unauthorized learning items request");
+        logout();
       }
     } catch (error) {
       console.error("Error fetching learning items:", error);
@@ -105,8 +120,10 @@ const AdminTestAdd: React.FC = () => {
   };
 
   const fetchQuestions = async () => {
+    if (!token) return;
+
     try {
-      const response = await fetch("http://127.0.0.1:8000/admin/questions", {
+      const response = await fetch(`/admin/questions`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -114,6 +131,9 @@ const AdminTestAdd: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         setQuestions(data);
+      } else if (response.status === 401) {
+        console.error("❌ Unauthorized questions request");
+        logout();
       }
     } catch (error) {
       console.error("Error fetching questions:", error);
@@ -128,16 +148,21 @@ const AdminTestAdd: React.FC = () => {
     }
 
     try {
+      const method = editingTopicId ? "PUT" : "POST";
+      const url = editingTopicId 
+        ? `/admin/topics/${editingTopicId}`
+        : "/admin/topics";
+
       const payload = {
         name: topicForm.name,
         description: topicForm.description || "",
         order: 0
       };
       
-      console.log("Sending topic payload:", payload);
+      console.log(`${method} topic payload:`, payload);
       
-      const response = await fetch("http://127.0.0.1:8000/admin/topics", {
-        method: "POST",
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -149,13 +174,14 @@ const AdminTestAdd: React.FC = () => {
 
       if (response.ok) {
         setTopicForm({ name: "", description: "" });
+        setEditingTopicId(null);
         setShowTopicForm(false);
         fetchTopics();
-        alert("✅ Mavzu muvaffaqiyatli qo'shildi!");
+        alert(editingTopicId ? "✅ Mavzu muvaffaqiyatli o'zgartirildi!" : "✅ Mavzu muvaffaqiyatli qo'shildi!");
       } else {
         const errorData = await response.json().catch(() => ({ detail: "Unknown error" }));
         console.error("Error response:", response.status, errorData);
-        alert(`❌ Xato: ${errorData.detail || "Mavzu qo'shishda xato yuz berdi"}`);
+        alert(`❌ Xato: ${errorData.detail || "Mavzuni saqlashda xato yuz berdi"}`);
       }
     } catch (error) {
       console.error("Error adding topic:", error);
@@ -171,6 +197,11 @@ const AdminTestAdd: React.FC = () => {
     }
 
     try {
+      const method = editingLearningId ? "PUT" : "POST";
+      const url = editingLearningId 
+        ? `/admin/learning-items/${editingLearningId}`
+        : "/admin/learning-items";
+
       const payload = {
         topic_id: learningForm.topic_id || 1,
         latin_term: learningForm.latin_term,
@@ -179,10 +210,10 @@ const AdminTestAdd: React.FC = () => {
         order: 0
       };
 
-      console.log("Sending learning payload:", payload);
+      console.log(`${method} learning payload:`, payload);
 
-      const response = await fetch("http://127.0.0.1:8000/admin/learning-items", {
-        method: "POST",
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -199,13 +230,14 @@ const AdminTestAdd: React.FC = () => {
           uzbek_term: "",
           description: "",
         });
+        setEditingLearningId(null);
         setShowLearningForm(false);
         fetchLearningItems();
-        alert("✅ O'rganish elementi muvaffaqiyatli qo'shildi!");
+        alert(editingLearningId ? "✅ Material muvaffaqiyatli o'zgartirildi!" : "✅ O'rganish elementi muvaffaqiyatli qo'shildi!");
       } else {
         const errorData = await response.json().catch(() => ({ detail: "Unknown error" }));
         console.error("Error response:", response.status, errorData);
-        alert(`❌ Xato: ${errorData.detail || "O'rganish elementini qo'shishda xato yuz berdi"}`);
+        alert(`❌ Xato: ${errorData.detail || "O'rganish elementini saqlashda xato yuz berdi"}`);
       }
     } catch (error) {
       console.error("Error adding learning item:", error);
@@ -221,6 +253,11 @@ const AdminTestAdd: React.FC = () => {
     }
 
     try {
+      const method = editingQuestionId ? "PUT" : "POST";
+      const url = editingQuestionId 
+        ? `/admin/questions/${editingQuestionId}`
+        : "/admin/questions";
+
       const payload = {
         topic_id: questionForm.topic_id || 1,
         question_text: questionForm.question_text,
@@ -230,10 +267,10 @@ const AdminTestAdd: React.FC = () => {
         order: 0
       };
 
-      console.log("Sending question payload:", payload);
+      console.log(`${method} question payload:`, payload);
 
-      const response = await fetch("http://127.0.0.1:8000/admin/questions", {
-        method: "POST",
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -251,13 +288,14 @@ const AdminTestAdd: React.FC = () => {
           options: ["", "", "", ""],
           difficulty: "easy",
         });
+        setEditingQuestionId(null);
         setShowQuestionForm(false);
         fetchQuestions();
-        alert("✅ Savol muvaffaqiyatli qo'shildi!");
+        alert(editingQuestionId ? "✅ Test muvaffaqiyatli o'zgartirildi!" : "✅ Test muvaffaqiyatli qo'shildi!");
       } else {
         const errorData = await response.json().catch(() => ({ detail: "Unknown error" }));
         console.error("Error response:", response.status, errorData);
-        alert(`❌ Xato: ${errorData.detail || "Savol qo'shishda xato yuz berdi"}`);
+        alert(`❌ Xato: ${errorData.detail || "Testni saqlashda xato yuz berdi"}`);
       }
     } catch (error) {
       console.error("Error adding question:", error);
@@ -265,11 +303,21 @@ const AdminTestAdd: React.FC = () => {
     }
   };
 
-  const handleDeleteTopic = async (id: number) => {
-    if (!token || !window.confirm("Mavzuni o'chirishni tasdiqlang?")) return;
+  const handleEditTopic = (topic: Topic) => {
+    setEditingTopicId(topic.id);
+    setTopicForm({ name: topic.name, description: topic.description || "" });
+    setShowTopicForm(true);
+  };
+
+  const handleDeleteTopic = (id: number) => {
+    setConfirmModal({ type: "topic", id });
+  };
+
+  const confirmDeleteTopic = async (id: number) => {
+    if (!token) return;
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/admin/topics/${id}`, {
+      const response = await fetch(`/admin/topics/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -278,11 +326,10 @@ const AdminTestAdd: React.FC = () => {
 
       if (response.ok) {
         fetchTopics();
-        alert("Mavzu muvaffaqiyatli o'chirildi!");
+        setConfirmModal(null);
       } else {
         const errorData = await response.json().catch(() => ({}));
         alert(`Xato: ${errorData.detail || "Mavzuni o'chirishda xato yuz berdi"}`);
-        console.error("Error response:", response.status, errorData);
       }
     } catch (error) {
       console.error("Error deleting topic:", error);
@@ -290,52 +337,127 @@ const AdminTestAdd: React.FC = () => {
     }
   };
 
+  const handleEditLearning = (item: LearningItem) => {
+    setEditingLearningId(item.id);
+    setLearningForm({
+      topic_id: item.topic_id,
+      latin_term: item.latin_term,
+      uzbek_term: item.uzbek_term,
+      description: item.description || "",
+    });
+    setShowLearningForm(true);
+  };
+
+  const handleDeleteLearning = (id: number) => {
+    setConfirmModal({ type: "learning", id });
+  };
+
+  const confirmDeleteLearning = async (id: number) => {
+    if (!token) return;
+
+    try {
+      const response = await fetch(`/admin/learning-items/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        fetchLearningItems();
+        setConfirmModal(null);
+      } else {
+        alert("Materialni o'chirishda xato bo'ldi");
+      }
+    } catch (error) {
+      console.error("Error deleting learning item:", error);
+      alert("Serverga ulanishda xato yuz berdi");
+    }
+  };
+
+  const handleEditQuestion = (question: TestQuestion) => {
+    setEditingQuestionId(question.id);
+    setQuestionForm({
+      topic_id: question.topic_id,
+      question_text: question.question_text,
+      correct_answer: question.correct_answer,
+      options: question.options,
+      difficulty: question.difficulty || "easy",
+    });
+    setShowQuestionForm(true);
+  };
+
+  const handleDeleteQuestion = (id: number) => {
+    setConfirmModal({ type: "question", id });
+  };
+
+  const confirmDeleteQuestion = async (id: number) => {
+    if (!token) return;
+
+    try {
+      const response = await fetch(`/admin/questions/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        fetchQuestions();
+        setConfirmModal(null);
+      } else {
+        alert("Testni o'chirishda xato bo'ldi");
+      }
+    } catch (error) {
+      console.error("Error deleting question:", error);
+      alert("Serverga ulanishda xato yuz berdi");
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-4xl font-bold text-white mb-2">
-          📚 Test Qo'shish
-        </h1>
-        <p className="text-gray-400">
-          Mavzu, o'rganish materiallari va test savollarini boshqarish
-        </p>
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-3">
+          <BarChart3 className="w-8 h-8 text-brand-500" />
+          <h1 className="text-4xl font-bold text-white">Test O'qitish</h1>
+        </div>
       </div>
 
-      {/* Tabs */}
+      {/* Tab Navigation */}
       <div className="flex gap-4 border-b border-gray-800">
         <button
           onClick={() => setActiveTab("topics")}
-          className={`px-6 py-3 font-semibold flex items-center gap-2 border-b-2 transition-all ${
+          className={`px-6 py-4 font-semibold transition-colors ${
             activeTab === "topics"
-              ? "border-brand-500 text-brand-400"
-              : "border-transparent text-gray-400 hover:text-gray-300"
+              ? "text-brand-500 border-b-2 border-brand-500"
+              : "text-gray-400 hover:text-gray-300"
           }`}
         >
-          <BarChart3 className="w-5 h-5" />
+          <BookOpen className="w-5 h-5 inline-block mr-2" />
           Mavzular
         </button>
         <button
           onClick={() => setActiveTab("learning")}
-          className={`px-6 py-3 font-semibold flex items-center gap-2 border-b-2 transition-all ${
+          className={`px-6 py-4 font-semibold transition-colors ${
             activeTab === "learning"
-              ? "border-brand-500 text-brand-400"
-              : "border-transparent text-gray-400 hover:text-gray-300"
+              ? "text-brand-500 border-b-2 border-brand-500"
+              : "text-gray-400 hover:text-gray-300"
           }`}
         >
-          <BookOpen className="w-5 h-5" />
+          <BookOpen className="w-5 h-5 inline-block mr-2" />
           O'rganish
         </button>
         <button
           onClick={() => setActiveTab("questions")}
-          className={`px-6 py-3 font-semibold flex items-center gap-2 border-b-2 transition-all ${
+          className={`px-6 py-4 font-semibold transition-colors ${
             activeTab === "questions"
-              ? "border-brand-500 text-brand-400"
-              : "border-transparent text-gray-400 hover:text-gray-300"
+              ? "text-brand-500 border-b-2 border-brand-500"
+              : "text-gray-400 hover:text-gray-300"
           }`}
         >
-          <HelpCircle className="w-5 h-5" />
-          Savollar
+          <HelpCircle className="w-5 h-5 inline-block mr-2" />
+          Testlar
         </button>
       </div>
 
@@ -345,7 +467,11 @@ const AdminTestAdd: React.FC = () => {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold text-white">Mavzular</h2>
             <button
-              onClick={() => setShowTopicForm(!showTopicForm)}
+              onClick={() => {
+                setEditingTopicId(null);
+                setTopicForm({ name: "", description: "" });
+                setShowTopicForm(!showTopicForm);
+              }}
               className="px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-semibold flex items-center gap-2 transition-all"
             >
               <Plus className="w-5 h-5" />
@@ -354,46 +480,53 @@ const AdminTestAdd: React.FC = () => {
           </div>
 
           {showTopicForm && (
-            <div className="rounded-3xl border border-gray-800/50 bg-gradient-to-br from-gray-800/30 to-gray-900/50 p-8">
-              <form onSubmit={handleAddTopic} className="space-y-4">
-                <div>
-                  <label className="block text-white mb-2 font-semibold">Mavzu Nomi</label>
-                  <input
-                    type="text"
-                    value={topicForm.name}
-                    onChange={(e) => setTopicForm({ ...topicForm, name: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-800 text-white focus:border-brand-500 focus:outline-none"
-                    placeholder="Masalan: Anatomiya"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-white mb-2 font-semibold">Tavsifi</label>
-                  <textarea
-                    value={topicForm.description}
-                    onChange={(e) => setTopicForm({ ...topicForm, description: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-800 text-white focus:border-brand-500 focus:outline-none"
-                    placeholder="Mavzunin tavsifi..."
-                    rows={3}
-                  />
-                </div>
-                <div className="flex gap-3 pt-4">
-                  <button
-                    type="submit"
-                    className="flex-1 px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-all"
-                  >
-                    <Save className="w-5 h-5" />
-                    Saqlash
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowTopicForm(false)}
-                    className="flex-1 px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-xl font-semibold transition-all"
-                  >
-                    Bekor Qilish
-                  </button>
-                </div>
-              </form>
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <div className="rounded-3xl border border-gray-800/50 bg-gradient-to-br from-gray-800/30 to-gray-900/50 p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <h3 className="text-xl font-bold text-white mb-6">
+                  {editingTopicId ? "Mavzuni O'zgartirish" : "Yangi Mavzu Qo'shish"}
+                </h3>
+                <form onSubmit={handleAddTopic} className="space-y-6">
+                  <div>
+                    <label className="block text-gray-300 font-semibold mb-2">Mavzu Nomi</label>
+                    <input
+                      type="text"
+                      value={topicForm.name}
+                      onChange={(e) => setTopicForm({ ...topicForm, name: e.target.value })}
+                      placeholder="Mavzu nomini kiriting..."
+                      className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-brand-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-300 font-semibold mb-2">Tavsif</label>
+                    <textarea
+                      value={topicForm.description}
+                      onChange={(e) => setTopicForm({ ...topicForm, description: e.target.value })}
+                      placeholder="Mavzu tavsifini kiriting..."
+                      rows={4}
+                      className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-brand-500 focus:outline-none"
+                    />
+                  </div>
+                  <div className="flex gap-4">
+                    <button
+                      type="submit"
+                      className="flex-1 px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-all"
+                    >
+                      <Save className="w-5 h-5" />
+                      Saqlash
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowTopicForm(false);
+                        setEditingTopicId(null);
+                      }}
+                      className="flex-1 px-6 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl font-semibold transition-all"
+                    >
+                      Bekor qilish
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           )}
 
@@ -404,7 +537,10 @@ const AdminTestAdd: React.FC = () => {
                 <h3 className="text-lg font-bold text-white mb-2">{topic.name}</h3>
                 <p className="text-gray-400 text-sm mb-4">{topic.description || "Tavsifi yo'q"}</p>
                 <div className="flex gap-2">
-                  <button className="flex-1 p-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-all flex items-center justify-center gap-2">
+                  <button
+                    onClick={() => handleEditTopic(topic)}
+                    className="flex-1 p-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-all flex items-center justify-center gap-2"
+                  >
                     <Edit2 className="w-4 h-4" />
                     O'zgartirish
                   </button>
@@ -428,7 +564,16 @@ const AdminTestAdd: React.FC = () => {
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold text-white">O'rganish Materiallari</h2>
             <button
-              onClick={() => setShowLearningForm(!showLearningForm)}
+              onClick={() => {
+                setEditingLearningId(null);
+                setLearningForm({
+                  topic_id: 0,
+                  latin_term: "",
+                  uzbek_term: "",
+                  description: "",
+                });
+                setShowLearningForm(!showLearningForm);
+              }}
               className="px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-semibold flex items-center gap-2 transition-all"
             >
               <Plus className="w-5 h-5" />
@@ -437,73 +582,78 @@ const AdminTestAdd: React.FC = () => {
           </div>
 
           {showLearningForm && (
-            <div className="rounded-3xl border border-gray-800/50 bg-gradient-to-br from-gray-800/30 to-gray-900/50 p-8">
-              <form onSubmit={handleAddLearning} className="space-y-4">
-                <div>
-                  <label className="block text-white mb-2 font-semibold">Mavzu Tanlang</label>
-                  <select
-                    value={learningForm.topic_id}
-                    onChange={(e) => setLearningForm({ ...learningForm, topic_id: parseInt(e.target.value) })}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-800 text-white focus:border-brand-500 focus:outline-none"
-                    required
-                  >
-                    <option value={0}>Mavzuni tanlang...</option>
-                    {topics.map((t) => (
-                      <option key={t.id} value={t.id}>
-                        {t.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-white mb-2 font-semibold">Lotin Terminni</label>
-                  <input
-                    type="text"
-                    value={learningForm.latin_term}
-                    onChange={(e) => setLearningForm({ ...learningForm, latin_term: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-800 text-white focus:border-brand-500 focus:outline-none"
-                    placeholder="Masalan: Skeletus"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-white mb-2 font-semibold">O'zbek Terminni</label>
-                  <input
-                    type="text"
-                    value={learningForm.uzbek_term}
-                    onChange={(e) => setLearningForm({ ...learningForm, uzbek_term: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-800 text-white focus:border-brand-500 focus:outline-none"
-                    placeholder="Masalan: Suyak Tuzilmasi"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-white mb-2 font-semibold">Tavsifi</label>
-                  <textarea
-                    value={learningForm.description}
-                    onChange={(e) => setLearningForm({ ...learningForm, description: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-800 text-white focus:border-brand-500 focus:outline-none"
-                    placeholder="Terminning tavsifi..."
-                    rows={3}
-                  />
-                </div>
-                <div className="flex gap-3 pt-4">
-                  <button
-                    type="submit"
-                    className="flex-1 px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-all"
-                  >
-                    <Save className="w-5 h-5" />
-                    Saqlash
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowLearningForm(false)}
-                    className="flex-1 px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-xl font-semibold transition-all"
-                  >
-                    Bekor Qilish
-                  </button>
-                </div>
-              </form>
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <div className="rounded-3xl border border-gray-800/50 bg-gradient-to-br from-gray-800/30 to-gray-900/50 p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <h3 className="text-xl font-bold text-white mb-6">
+                  {editingLearningId ? "Materialni O'zgartirish" : "Yangi Material Qo'shish"}
+                </h3>
+                <form onSubmit={handleAddLearning} className="space-y-6">
+                  <div>
+                    <label className="block text-gray-300 font-semibold mb-2">Mavzu</label>
+                    <select
+                      value={learningForm.topic_id}
+                      onChange={(e) => setLearningForm({ ...learningForm, topic_id: Number(e.target.value) })}
+                      className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-brand-500 focus:outline-none"
+                    >
+                      <option value={0}>Mavzuni tanlang...</option>
+                      {topics.map((topic) => (
+                        <option key={topic.id} value={topic.id}>
+                          {topic.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-gray-300 font-semibold mb-2">Lotin Ismi</label>
+                    <input
+                      type="text"
+                      value={learningForm.latin_term}
+                      onChange={(e) => setLearningForm({ ...learningForm, latin_term: e.target.value })}
+                      placeholder="Lotin ismi..."
+                      className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-brand-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-300 font-semibold mb-2">O'zbek Ismi</label>
+                    <input
+                      type="text"
+                      value={learningForm.uzbek_term}
+                      onChange={(e) => setLearningForm({ ...learningForm, uzbek_term: e.target.value })}
+                      placeholder="O'zbek ismi..."
+                      className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-brand-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-300 font-semibold mb-2">Tavsif</label>
+                    <textarea
+                      value={learningForm.description}
+                      onChange={(e) => setLearningForm({ ...learningForm, description: e.target.value })}
+                      placeholder="Tavsif..."
+                      rows={4}
+                      className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-brand-500 focus:outline-none"
+                    />
+                  </div>
+                  <div className="flex gap-4">
+                    <button
+                      type="submit"
+                      className="flex-1 px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-all"
+                    >
+                      <Save className="w-5 h-5" />
+                      Saqlash
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowLearningForm(false);
+                        setEditingLearningId(null);
+                      }}
+                      className="flex-1 px-6 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl font-semibold transition-all"
+                    >
+                      Bekor qilish
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           )}
 
@@ -527,10 +677,16 @@ const AdminTestAdd: React.FC = () => {
                       {topics.find(t => t.id === item.topic_id)?.name}
                     </td>
                     <td className="py-4 px-4 flex gap-2">
-                      <button className="p-2 rounded-lg bg-blue-500/10 text-blue-400">
+                      <button
+                        onClick={() => handleEditLearning(item)}
+                        className="p-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-all"
+                      >
                         <Edit2 className="w-4 h-4" />
                       </button>
-                      <button className="p-2 rounded-lg bg-red-500/10 text-red-400">
+                      <button
+                        onClick={() => handleDeleteLearning(item.id)}
+                        className="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all"
+                      >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </td>
@@ -546,103 +702,118 @@ const AdminTestAdd: React.FC = () => {
       {activeTab === "questions" && (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-white">Test Savollar</h2>
+            <h2 className="text-2xl font-bold text-white">Testlar</h2>
             <button
-              onClick={() => setShowQuestionForm(!showQuestionForm)}
+              onClick={() => {
+                setEditingQuestionId(null);
+                setQuestionForm({
+                  topic_id: 0,
+                  question_text: "",
+                  correct_answer: "",
+                  options: ["", "", "", ""],
+                  difficulty: "easy",
+                });
+                setShowQuestionForm(!showQuestionForm);
+              }}
               className="px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-semibold flex items-center gap-2 transition-all"
             >
               <Plus className="w-5 h-5" />
-              Yangi Savol
+              Yangi Test
             </button>
           </div>
 
           {showQuestionForm && (
-            <div className="rounded-3xl border border-gray-800/50 bg-gradient-to-br from-gray-800/30 to-gray-900/50 p-8">
-              <form onSubmit={handleAddQuestion} className="space-y-4">
-                <div>
-                  <label className="block text-white mb-2 font-semibold">Mavzu Tanlang</label>
-                  <select
-                    value={questionForm.topic_id}
-                    onChange={(e) => setQuestionForm({ ...questionForm, topic_id: parseInt(e.target.value) })}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-800 text-white focus:border-brand-500 focus:outline-none"
-                    required
-                  >
-                    <option value={0}>Mavzuni tanlang...</option>
-                    {topics.map((t) => (
-                      <option key={t.id} value={t.id}>
-                        {t.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-white mb-2 font-semibold">Savol Matni</label>
-                  <textarea
-                    value={questionForm.question_text}
-                    onChange={(e) => setQuestionForm({ ...questionForm, question_text: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-800 text-white focus:border-brand-500 focus:outline-none"
-                    placeholder="Savol yozing..."
-                    rows={3}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-white mb-2 font-semibold">To'g'ri Javob</label>
-                  <input
-                    type="text"
-                    value={questionForm.correct_answer}
-                    onChange={(e) => setQuestionForm({ ...questionForm, correct_answer: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-800 text-white focus:border-brand-500 focus:outline-none"
-                    placeholder="To'g'ri javobni yozing"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-white mb-2 font-semibold">Noto'g'ri Javoblar (3 ta)</label>
-                  {questionForm.options.map((option, i) => (
-                    <input
-                      key={i}
-                      type="text"
-                      value={option}
-                      onChange={(e) => {
-                        const newOptions = [...questionForm.options];
-                        newOptions[i] = e.target.value;
-                        setQuestionForm({ ...questionForm, options: newOptions });
-                      }}
-                      className="w-full mb-2 px-4 py-3 rounded-xl bg-gray-900 border border-gray-800 text-white focus:border-brand-500 focus:outline-none"
-                      placeholder={`Noto'g'ri javob ${i + 1}`}
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <div className="rounded-3xl border border-gray-800/50 bg-gradient-to-br from-gray-800/30 to-gray-900/50 p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <h3 className="text-xl font-bold text-white mb-6">
+                  {editingQuestionId ? "Testni O'zgartirish" : "Yangi Test Qo'shish"}
+                </h3>
+                <form onSubmit={handleAddQuestion} className="space-y-6">
+                  <div>
+                    <label className="block text-gray-300 font-semibold mb-2">Mavzu</label>
+                    <select
+                      value={questionForm.topic_id}
+                      onChange={(e) => setQuestionForm({ ...questionForm, topic_id: Number(e.target.value) })}
+                      className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-brand-500 focus:outline-none"
+                    >
+                      <option value={0}>Mavzuni tanlang...</option>
+                      {topics.map((topic) => (
+                        <option key={topic.id} value={topic.id}>
+                          {topic.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-gray-300 font-semibold mb-2">Savol Matni</label>
+                    <textarea
+                      value={questionForm.question_text}
+                      onChange={(e) => setQuestionForm({ ...questionForm, question_text: e.target.value })}
+                      placeholder="Savol yozing..."
+                      rows={3}
+                      className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-brand-500 focus:outline-none"
                     />
-                  ))}
-                </div>
-                <div>
-                  <label className="block text-white mb-2 font-semibold">Qiyinchilik Darajasi</label>
-                  <select
-                    value={questionForm.difficulty}
-                    onChange={(e) => setQuestionForm({ ...questionForm, difficulty: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-800 text-white focus:border-brand-500 focus:outline-none"
-                  >
-                    <option value="easy">Oson</option>
-                    <option value="medium">O'rta</option>
-                    <option value="hard">Qiyin</option>
-                  </select>
-                </div>
-                <div className="flex gap-3 pt-4">
-                  <button
-                    type="submit"
-                    className="flex-1 px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-all"
-                  >
-                    <Save className="w-5 h-5" />
-                    Saqlash
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowQuestionForm(false)}
-                    className="flex-1 px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-xl font-semibold transition-all"
-                  >
-                    Bekor Qilish
-                  </button>
-                </div>
-              </form>
+                  </div>
+                  <div>
+                    <label className="block text-gray-300 font-semibold mb-2">To'g'ri Javob</label>
+                    <input
+                      type="text"
+                      value={questionForm.correct_answer}
+                      onChange={(e) => setQuestionForm({ ...questionForm, correct_answer: e.target.value })}
+                      placeholder="To'g'ri javob..."
+                      className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-brand-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-300 font-semibold mb-2">Javob Variantlari</label>
+                    {questionForm.options.map((option, index) => (
+                      <input
+                        key={index}
+                        type="text"
+                        value={option}
+                        onChange={(e) => {
+                          const newOptions = [...questionForm.options];
+                          newOptions[index] = e.target.value;
+                          setQuestionForm({ ...questionForm, options: newOptions });
+                        }}
+                        placeholder={`Variant ${index + 1}...`}
+                        className="w-full px-4 py-2 mb-2 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-brand-500 focus:outline-none"
+                      />
+                    ))}
+                  </div>
+                  <div>
+                    <label className="block text-gray-300 font-semibold mb-2">Qiyinchilik Darajasi</label>
+                    <select
+                      value={questionForm.difficulty}
+                      onChange={(e) => setQuestionForm({ ...questionForm, difficulty: e.target.value })}
+                      className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:border-brand-500 focus:outline-none"
+                    >
+                      <option value="easy">Oson</option>
+                      <option value="medium">O'rta</option>
+                      <option value="hard">Qiyin</option>
+                    </select>
+                  </div>
+                  <div className="flex gap-4">
+                    <button
+                      type="submit"
+                      className="flex-1 px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-all"
+                    >
+                      <Save className="w-5 h-5" />
+                      Saqlash
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowQuestionForm(false);
+                        setEditingQuestionId(null);
+                      }}
+                      className="flex-1 px-6 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl font-semibold transition-all"
+                    >
+                      Bekor qilish
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           )}
 
@@ -660,10 +831,16 @@ const AdminTestAdd: React.FC = () => {
                       </span>
                     </div>
                     <div className="flex gap-2">
-                      <button className="p-2 rounded-lg bg-blue-500/10 text-blue-400">
+                      <button
+                        onClick={() => handleEditQuestion(q)}
+                        className="p-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-all"
+                      >
                         <Edit2 className="w-4 h-4" />
                       </button>
-                      <button className="p-2 rounded-lg bg-red-500/10 text-red-400">
+                      <button
+                        onClick={() => handleDeleteQuestion(q.id)}
+                        className="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all"
+                      >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -674,6 +851,33 @@ const AdminTestAdd: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Confirmation Modal */}
+      <ConfirmModal
+        isOpen={!!confirmModal}
+        title={
+          confirmModal?.type === "topic"
+            ? "Mavzuni o'chirish"
+            : confirmModal?.type === "learning"
+            ? "Materialni o'chirish"
+            : "Testni o'chirish"
+        }
+        message={
+          confirmModal?.type === "topic"
+            ? "Siz bu mavzuni o'chirmoqchisiz? Bu amalni qaytara olmaysiz!"
+            : confirmModal?.type === "learning"
+            ? "Siz bu materialni o'chirmoqchisiz? Bu amalni qaytara olmaysiz!"
+            : "Siz bu testni o'chirmoqchisiz? Bu amalni qaytara olmaysiz!"
+        }
+        confirmText="O'chirish"
+        confirmVariant="danger"
+        onCancel={() => setConfirmModal(null)}
+        onConfirm={() => {
+          if (confirmModal?.type === "topic" && confirmModal.id) confirmDeleteTopic(confirmModal.id);
+          if (confirmModal?.type === "learning" && confirmModal.id) confirmDeleteLearning(confirmModal.id);
+          if (confirmModal?.type === "question" && confirmModal.id) confirmDeleteQuestion(confirmModal.id);
+        }}
+      />
     </div>
   );
 };

@@ -3,7 +3,6 @@ from typing import Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.base import Med
@@ -11,6 +10,7 @@ from app.schemas.med_schemas import TokenData
 import os
 from dotenv import load_dotenv
 import logging
+import bcrypt
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -20,43 +20,58 @@ SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-# Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 # OAuth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Passwordni verify qilish - bcrypt 72 byte limitini hisobga olish"""
+    """Verify password against bcrypt hash"""
+    if not plain_password or not hashed_password:
+        return False
+    
     try:
-        # Bcrypt has a 72 byte limit - truncate if necessary
-        truncated_password = plain_password[:72]
-        return pwd_context.verify(truncated_password, hashed_password)
+        plain_bytes = plain_password[:72].encode('utf-8')
+        hash_bytes = hashed_password.encode('utf-8') if isinstance(hashed_password, str) else hashed_password
+        result = bcrypt.checkpw(plain_bytes, hash_bytes)
+        logger.debug(f"[AUTH] Password verification result: {result}")
+        return result
     except Exception as e:
-        logger.error(f"Password verification error: {e}")
+        logger.debug(f"[AUTH] Password verification error: {e}")
         return False
 
 
 def get_password_hash(password: str) -> str:
-    """Password xeshini olish - bcrypt 72 byte limitini hisobga olish"""
-    # Bcrypt has a 72 byte limit - truncate if necessary
-    truncated_password = password[:72]
-    return pwd_context.hash(truncated_password)
+    """Generate bcrypt hash from password"""
+    try:
+        password_bytes = password[:72].encode('utf-8')
+        salt = bcrypt.gensalt(rounds=12)
+        hashed = bcrypt.hashpw(password_bytes, salt)
+        return hashed.decode('utf-8')
+    except Exception as e:
+        logger.error(f"[AUTH] Error hashing password: {e}")
+        raise
+
 
 
 def authenticate_user(db: Session, email: str, password: str) -> Optional[Med]:
     """Userni email va password orqali authenticate qilish"""
-    try:
-        user = db.query(Med).filter(Med.email == email).first()
-        if not user:
-            return False
-        if not user.hashed_password or not verify_password(password, user.hashed_password):
-            return False
-        return user
-    except Exception as e:
-        logger.error(f"Authentication error: {e}")
+    logger.info(f"[AUTH] Authenticating user: {email}")
+    user = db.query(Med).filter(Med.email == email).first()
+    if not user:
+        logger.warning(f"[AUTH] User not found: {email}")
         return False
+    if not user.hashed_password:
+        logger.warning(f"[AUTH] User has no password hash: {email}")
+        return False
+    
+    password_valid = verify_password(password, user.hashed_password)
+    logger.info(f"[AUTH] Password valid for {email}: {password_valid}")
+    
+    if not password_valid:
+        return False
+    
+    logger.info(f"[AUTH] User authenticated successfully: {email}")
+    return user
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
@@ -76,6 +91,7 @@ async def get_current_user(
     db: Session = Depends(get_db)
 ) -> Med:
     """Hozirgi userni token orqali olish"""
+    logger.info(f"[AUTH] get_current_user called, token: {token[:50] if token else 'None'}...")
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -83,15 +99,20 @@ async def get_current_user(
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        logger.info(f"[AUTH] Token decoded successfully, payload: {payload}")
         email: str = payload.get("sub")
         if email is None:
+            logger.error(f"[AUTH] No email in token payload")
             raise credentials_exception
         token_data = TokenData(email=email)
-    except JWTError:
+    except JWTError as e:
+        logger.error(f"[AUTH] JWT decode error: {e}")
         raise credentials_exception
     user = db.query(Med).filter(Med.email == token_data.email).first()
     if user is None:
+        logger.error(f"[AUTH] User not found in DB: {token_data.email}")
         raise credentials_exception
+    logger.info(f"[AUTH] User found and authenticated: {user.email}")
     return user
 
 
