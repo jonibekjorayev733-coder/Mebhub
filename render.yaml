@@ -42,4 +42,4 @@ services:
         value: https://mebhub-frontend.onrender.com
     
     buildCommand: npm install && npm run build
-    startCommand: npm run preview
+    startCommand: npm install -g serve && serve -s dist -l 3000
