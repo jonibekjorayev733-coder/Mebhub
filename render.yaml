@@ -21,9 +21,7 @@ services:
         value: https://mebhub-frontend.onrender.com,https://mebhub.onrender.com
     
     buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port 10000
-    
-    healthCheckPath: /health
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port 8000
 
   - type: web
     name: mebhub-frontend
@@ -42,4 +40,4 @@ services:
         value: https://mebhub-frontend.onrender.com
     
     buildCommand: npm install && npm run build
-    startCommand: npm install -g serve && serve -s dist -l 3000
+    startCommand: npm install -g serve && serve -s dist -l $PORT
