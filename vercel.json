@@ -3,7 +3,9 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "env": {
-    "VITE_API_BASE_URL": "@api_base_url",
+    "VITE_API_BASE_URL": "@api_url",
     "VITE_FRONTEND_URL": "@frontend_url"
-  }
+  },
+  "envPrefix": "VITE_"
 }
+
