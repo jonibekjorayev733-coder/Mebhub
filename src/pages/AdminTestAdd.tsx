@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Plus, Trash2, Edit2, BookOpen, HelpCircle, BarChart3, Save } from "lucide-react";
-import ConfirmModal from "../components/ConfirmModal";
+import ConfirmModal from "../Components/ConfirmModal";
 
 interface Topic {
   id: number;
