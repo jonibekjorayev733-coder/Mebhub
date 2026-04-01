@@ -5,11 +5,9 @@ services:
     pythonVersion: 3.11
     region: oregon
     plan: free
-    
     repo: https://github.com/jonibekjorayev733-coder/Mebhub.git
     branch: main
     rootDir: Uzgame
-    
     envVars:
       - key: DATABASE_URL
         value: postgresql://neondb_owner:npg_5udcFkn3wqTm@ep-old-breeze-a1fs7dt5-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
@@ -19,7 +17,8 @@ services:
         generateValue: true
       - key: CORS_ORIGINS
         value: https://mebhub-frontend.onrender.com,https://mebhub.onrender.com
-    
+      - key: PORT
+        value: '8000'
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port 8000
 
@@ -29,15 +28,12 @@ services:
     nodeVersion: 18
     region: oregon
     plan: free
-    
     repo: https://github.com/jonibekjorayev733-coder/Mebhub.git
     branch: main
-    
+    buildCommand: npm install && npm run build
+    startCommand: npm install -g serve && serve -s dist -l 3000
     envVars:
       - key: VITE_API_BASE_URL
         value: https://mebhub-backend.onrender.com
       - key: VITE_FRONTEND_URL
         value: https://mebhub-frontend.onrender.com
-    
-    buildCommand: npm install && npm run build
-    startCommand: npm install -g serve && serve -s dist -l $PORT
