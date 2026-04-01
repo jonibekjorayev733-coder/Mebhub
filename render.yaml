@@ -19,8 +19,8 @@ services:
         value: https://mebhub-frontend.onrender.com,https://mebhub.onrender.com
       - key: PORT
         value: '8000'
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    buildCommand: cd Uzgame && pip install -r requirements.txt
+    startCommand: cd Uzgame && uvicorn app.main:app --host 0.0.0.0 --port 8000
 
   - type: web
     name: mebhub-frontend
