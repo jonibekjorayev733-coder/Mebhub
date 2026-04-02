@@ -16,21 +16,23 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: CORS_ORIGINS
-        value: https://mebhub-frontend.vercel.app,https://mebhub-backend.onrender.com
+        value: https://mebhub-frontend.onrender.com
       - key: PORT
         value: '8000'
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port 8000
 
-  - type: static
+  - type: web
     name: mebhub-frontend
+    runtime: node
+    plan: free
     repo: https://github.com/jonibekjorayev733-coder/Mebhub.git
     branch: main
     buildCommand: npm install && npm run build
-    staticPublishPath: ./dist
+    startCommand: npm run preview
     envVars:
       - key: VITE_API_BASE_URL
-        value: http://127.0.0.1:8000
+        value: https://mebhub-backend.onrender.com
     routes:
       - path: /*
         destination: /index.html
