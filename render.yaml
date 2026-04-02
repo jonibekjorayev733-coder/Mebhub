@@ -35,3 +35,4 @@ services:
     routes:
       - source: /.*
         destination: /index.html
+        type: rewrite
