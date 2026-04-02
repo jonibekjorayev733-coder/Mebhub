@@ -24,7 +24,6 @@ services:
   - type: web
     name: mebhub-frontend
     runtime: static
-    plan: free
     repo: https://github.com/jonibekjorayev733-coder/Mebhub.git
     branch: main
     buildCommand: npm install && npm run build
