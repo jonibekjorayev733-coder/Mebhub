@@ -2,7 +2,7 @@ services:
   - type: web
     name: mebhub-backend
     runtime: python
-    pythonVersion: 3.11
+    pythonVersion: "3.11"
     region: oregon
     plan: free
     repo: https://github.com/jonibekjorayev733-coder/Mebhub.git
@@ -17,14 +17,13 @@ services:
         generateValue: true
       - key: CORS_ORIGINS
         value: https://mebhub-frontend.onrender.com
-      - key: PORT
-        value: '8000'
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port 8000
 
   - type: web
     name: mebhub-frontend
     runtime: node
+    nodeVersion: "22"
     plan: free
     repo: https://github.com/jonibekjorayev733-coder/Mebhub.git
     branch: main
@@ -33,6 +32,3 @@ services:
     envVars:
       - key: VITE_API_BASE_URL
         value: https://mebhub-backend.onrender.com
-    routes:
-      - path: /*
-        destination: /index.html
