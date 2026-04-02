@@ -2,7 +2,7 @@ services:
   - type: web
     name: mebhub-backend
     runtime: python
-    pythonVersion: "3.11"
+    pythonVersion: 3.11
     region: oregon
     plan: free
     repo: https://github.com/jonibekjorayev733-coder/Mebhub.git
@@ -23,7 +23,7 @@ services:
   - type: web
     name: mebhub-frontend
     runtime: node
-    nodeVersion: "22"
+    nodeVersion: 22
     plan: free
     repo: https://github.com/jonibekjorayev733-coder/Mebhub.git
     branch: main
