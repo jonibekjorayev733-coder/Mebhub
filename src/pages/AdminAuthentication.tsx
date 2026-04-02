@@ -43,7 +43,8 @@ const AdminAuthentication: React.FC = () => {
     if (!token) return;
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/admin/users", {
+      const { getAPIBaseURL } = await import('../utils/authService');
+      const response = await fetch(`${getAPIBaseURL()}/admin/users`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -73,7 +74,8 @@ const AdminAuthentication: React.FC = () => {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/admin/create-admin", {
+      const { getAPIBaseURL } = await import('../utils/authService');
+      const response = await fetch(`${getAPIBaseURL()}/admin/create-admin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -106,7 +108,8 @@ const AdminAuthentication: React.FC = () => {
     if (!token || !window.confirm("Bu foydalanuvchini adminlikka ko'tarmoqchisiz?")) return;
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/admin/users/${userId}/make-admin`, {
+      const { getAPIBaseURL } = await import('../utils/authService');
+      const response = await fetch(`${getAPIBaseURL()}/admin/users/${userId}/make-admin`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -133,7 +136,8 @@ const AdminAuthentication: React.FC = () => {
     if (!token || !window.confirm("Bu foydalanuvchini adminlikdan olib tashlamoqchisiz?")) return;
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/admin/users/${userId}/remove-admin`, {
+      const { getAPIBaseURL } = await import('../utils/authService');
+      const response = await fetch(`${getAPIBaseURL()}/admin/users/${userId}/remove-admin`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -164,7 +168,8 @@ const AdminAuthentication: React.FC = () => {
     if (!token) return;
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/admin/users/${id}`, {
+      const { getAPIBaseURL } = await import('../utils/authService');
+      const response = await fetch(`${getAPIBaseURL()}/admin/users/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

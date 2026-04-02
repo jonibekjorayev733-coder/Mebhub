@@ -46,7 +46,8 @@ const AdminDashboard: React.FC = () => {
       }
 
       try {
-        const response = await fetch("http://127.0.0.1:8000/admin/stats", {
+        const { getAPIBaseURL } = await import('../utils/authService');
+        const response = await fetch(`${getAPIBaseURL()}/admin/stats`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,

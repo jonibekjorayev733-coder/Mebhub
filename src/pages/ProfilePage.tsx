@@ -69,7 +69,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
                 profile_picture: previewImage
             };
 
-            const response = await fetch(`http://127.0.0.1:8000/auth/profile`, {
+            const { getAPIBaseURL } = await import('../utils/authService');
+            const response = await fetch(`${getAPIBaseURL()}/auth/profile`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
