@@ -19,7 +19,7 @@ services:
       - key: CORS_ORIGINS
         value: https://mebhub-frontend.onrender.com
     buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    startCommand: python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT
 
   - type: web
     name: mebhub-frontend
