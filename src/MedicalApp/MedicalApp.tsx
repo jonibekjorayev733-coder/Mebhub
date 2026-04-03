@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { getAPIBaseURL } from '@/utils/authService';
 import { LandingPage } from './sections/LandingPage';
 import { TopicHub } from './pages/TopicHub';
 import { LearningMode } from './pages/LearningMode';
@@ -33,7 +34,7 @@ export const MedicalApp: React.FC = () => {
     useEffect(() => {
         const fetchTopics = async () => {
             try {
-                const response = await fetch('/learning/topics');
+                const response = await fetch(`${getAPIBaseURL()}/learning/topics`);
                 if (response.ok) {
                     const data = await response.json();
                     setDatabaseTopics(data);

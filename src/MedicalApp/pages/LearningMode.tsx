@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { getAPIBaseURL } from '@/utils/authService';
 import { useMedicalStore } from '../store/useMedicalStore';
 import { NeonButton } from '../components/UIElements';
 
@@ -30,7 +31,7 @@ export const LearningMode: React.FC<LearningModeProps> = ({ topicId, topicName, 
         const fetchItems = async () => {
             try {
                 setLoading(true);
-                const response = await fetch(`/learning/topics/${topicId}/items`);
+                const response = await fetch(`${getAPIBaseURL()}/learning/topics/${topicId}/items`);
                 if (!response.ok) throw new Error('Failed to fetch learning items');
                 const data = await response.json();
                 setItems(data);

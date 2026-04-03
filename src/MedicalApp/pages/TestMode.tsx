@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, XCircle, ChevronRight, Award, Trophy } from 'lucide-react';
+import { getAPIBaseURL } from '@/utils/authService';
 import { NeonButton } from '../components/UIElements';
 import { useMedicalStore, CertificateData } from '../store/useMedicalStore';
 import { useAuth } from '../../context/AuthContext';
@@ -40,8 +41,8 @@ export const TestMode: React.FC<TestModeProps> = ({ topicId, topicName, onExit }
             try {
                 setLoading(true);
                 const [questionsRes, topicsRes] = await Promise.all([
-                    fetch(`/learning/topics/${topicId}/questions`),
-                    fetch('/learning/topics')
+                    fetch(`${getAPIBaseURL()}/learning/topics/${topicId}/questions`),
+                    fetch(`${getAPIBaseURL()}/learning/topics`)
                 ]);
                 
                 if (!questionsRes.ok) throw new Error('Failed to fetch test questions');

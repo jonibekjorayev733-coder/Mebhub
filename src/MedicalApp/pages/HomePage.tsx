@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { topics as mockTopics } from '../data/mockData';
+import { getAPIBaseURL } from '@/utils/authService';
 import { NeonButton } from '../components/UIElements';
 import { useMedicalStore } from '../store/useMedicalStore';
 import { ChevronRight, CheckCircle2 } from 'lucide-react';
@@ -26,7 +27,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTopic, isEmbedded = 
         const fetchTopics = async () => {
             try {
                 setLoading(true);
-                const response = await fetch('/learning/topics');
+                const response = await fetch(`${getAPIBaseURL()}/learning/topics`);
                 if (response.ok) {
                     const data = await response.json();
                     setTopics(data);

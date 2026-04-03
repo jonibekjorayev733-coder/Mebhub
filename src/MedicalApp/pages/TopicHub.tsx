@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, Play, RotateCcw, Target } from 'lucide-react';
+import { getAPIBaseURL } from '@/utils/authService';
 import { useMedicalStore } from '../store/useMedicalStore';
 import { NeonButton } from '../components/UIElements';
 
@@ -33,7 +34,7 @@ export const TopicHub: React.FC<TopicHubProps> = ({
         const fetchItems = async () => {
             try {
                 setLoading(true);
-                const response = await fetch(`/learning/topics/${topicId}/items`);
+                const response = await fetch(`${getAPIBaseURL()}/learning/topics/${topicId}/items`);
                 if (!response.ok) throw new Error('Failed to fetch items');
                 const data = await response.json();
                 setItems(data);
