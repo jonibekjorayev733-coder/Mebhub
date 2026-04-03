@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { getAPIBaseURL } from "../utils/authService";
 import { Plus, Trash2, Edit2, BookOpen, HelpCircle, BarChart3, Save } from "lucide-react";
 import ConfirmModal from "../Components/ConfirmModal";
 
@@ -77,7 +78,7 @@ const AdminTestAdd: React.FC = () => {
   const fetchTopics = async () => {
     if (!token) return;
     try {
-      const response = await fetch("/admin/topics", {
+      const response = await fetch(`${getAPIBaseURL()}/admin/topics`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -102,7 +103,7 @@ const AdminTestAdd: React.FC = () => {
     if (!token) return;
 
     try {
-      const response = await fetch(`/admin/learning-items`, {
+      const response = await fetch(`${getAPIBaseURL()}/admin/learning-items`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -123,7 +124,7 @@ const AdminTestAdd: React.FC = () => {
     if (!token) return;
 
     try {
-      const response = await fetch(`/admin/questions`, {
+      const response = await fetch(`${getAPIBaseURL()}/admin/questions`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -150,8 +151,8 @@ const AdminTestAdd: React.FC = () => {
     try {
       const method = editingTopicId ? "PUT" : "POST";
       const url = editingTopicId 
-        ? `/admin/topics/${editingTopicId}`
-        : "/admin/topics";
+        ? `${getAPIBaseURL()}/admin/topics/${editingTopicId}`
+        : `${getAPIBaseURL()}/admin/topics`;
 
       const payload = {
         name: topicForm.name,
@@ -199,8 +200,8 @@ const AdminTestAdd: React.FC = () => {
     try {
       const method = editingLearningId ? "PUT" : "POST";
       const url = editingLearningId 
-        ? `/admin/learning-items/${editingLearningId}`
-        : "/admin/learning-items";
+        ? `${getAPIBaseURL()}/admin/learning-items/${editingLearningId}`
+        : `${getAPIBaseURL()}/admin/learning-items`;
 
       const payload = {
         topic_id: learningForm.topic_id || 1,
@@ -255,8 +256,8 @@ const AdminTestAdd: React.FC = () => {
     try {
       const method = editingQuestionId ? "PUT" : "POST";
       const url = editingQuestionId 
-        ? `/admin/questions/${editingQuestionId}`
-        : "/admin/questions";
+        ? `${getAPIBaseURL()}/admin/questions/${editingQuestionId}`
+        : `${getAPIBaseURL()}/admin/questions`;
 
       const payload = {
         topic_id: questionForm.topic_id || 1,
@@ -317,7 +318,7 @@ const AdminTestAdd: React.FC = () => {
     if (!token) return;
 
     try {
-      const response = await fetch(`/admin/topics/${id}`, {
+      const response = await fetch(`${getAPIBaseURL()}/admin/topics/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -356,7 +357,7 @@ const AdminTestAdd: React.FC = () => {
     if (!token) return;
 
     try {
-      const response = await fetch(`/admin/learning-items/${id}`, {
+      const response = await fetch(`${getAPIBaseURL()}/admin/learning-items/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -395,7 +396,7 @@ const AdminTestAdd: React.FC = () => {
     if (!token) return;
 
     try {
-      const response = await fetch(`/admin/questions/${id}`, {
+      const response = await fetch(`${getAPIBaseURL()}/admin/questions/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

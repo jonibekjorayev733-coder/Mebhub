@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { getAPIBaseURL } from "../utils/authService";
 
 interface Topic {
   id: number;
@@ -73,7 +74,7 @@ const AdminTopics: React.FC = () => {
         Authorization: `Bearer ${token}`,
       };
       
-      const response = await fetch("/admin/topics", {
+      const response = await fetch(`${getAPIBaseURL()}/admin/topics`, {
         method: "GET",
         headers: headers,
       });
@@ -125,7 +126,7 @@ const AdminTopics: React.FC = () => {
         Authorization: `Bearer ${token}`,
       };
 
-      const response = await fetch("/admin/topics", {
+      const response = await fetch(`${getAPIBaseURL()}/admin/topics`, {
         method: "POST",
         headers: headers,
         body: JSON.stringify(topicForm),
@@ -182,7 +183,7 @@ const AdminTopics: React.FC = () => {
         Authorization: `Bearer ${token}`,
       };
 
-      const response = await fetch("/admin/questions", {
+      const response = await fetch(`${getAPIBaseURL()}/admin/questions`, {
         method: "POST",
         headers: headers,
         body: JSON.stringify({
@@ -253,7 +254,7 @@ const AdminTopics: React.FC = () => {
         Authorization: `Bearer ${token}`,
       };
 
-      const response = await fetch("/admin/items", {
+      const response = await fetch(`${getAPIBaseURL()}/admin/items`, {
         method: "POST",
         headers: headers,
         body: JSON.stringify({
