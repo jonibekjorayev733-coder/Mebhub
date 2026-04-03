@@ -6,7 +6,7 @@
  */
 
 // Get API base URL with fallback strategy
-function getAPIBaseURL(): string {
+export function getAPIBaseURL(): string {
   // 1. Check explicit environment variable first
   const envURL = import.meta.env.VITE_API_BASE_URL;
   if (envURL) {
