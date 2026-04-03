@@ -11,7 +11,7 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.0
       - key: DATABASE_URL
-        value: postgresql://neondb_owner:npg_5udcFkn3wqTm@ep-old-breeze-a1fs7dt5-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
+        value: postgresql://neondb_owner:npg_lSRBvZVnqN91@ep-purple-mouse-a1q8ak9k-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
       - key: ENVIRONMENT
         value: production
       - key: SECRET_KEY
