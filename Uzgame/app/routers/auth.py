@@ -26,7 +26,7 @@ class ProfileUpdate(BaseModel):
     profile_picture: str | None = None
 
 
-@router.post("/register", response_model=MedSchema)
+@router.post("/register", response_model=Token)
 async def register(med: MedCreate, db: Session = Depends(get_db)):
     """
     Med jadvali uchun yangi foydalanuvchi ro'yxatdan o'tkazish
@@ -81,7 +81,19 @@ async def register(med: MedCreate, db: Session = Depends(get_db)):
         db.refresh(db_user)
         logger.info(f"✓ REGISTERED: {db_user.email} (ID={db_user.id})")
         
-        return db_user
+        # Create access token and return Token response
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": db_user.email},
+            expires_delta=access_token_expires
+        )
+        
+        logger.info(f"User registered and logged in: {db_user.email}")
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": db_user
+        }
         
     except Exception as e:
         db.rollback()
