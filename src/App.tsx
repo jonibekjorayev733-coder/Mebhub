@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
 import AdminLayout from "./layout/AdminLayout";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminTopics from "./pages/AdminTopics";
@@ -61,7 +60,6 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={isAuthenticated ? <Navigate to="/" /> : <LoginPage />} />
-      <Route path="/register" element={isAuthenticated ? <Navigate to="/" /> : <RegisterPage />} />
       <Route path="/" element={<Dashboard />} />
       <Route path="/home" element={<ProtectedRoute element={<Dashboard />} />} />
       <Route
