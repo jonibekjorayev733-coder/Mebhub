@@ -205,6 +205,15 @@ async def logout(current_user: Med = Depends(get_current_active_user)):
     return {"message": "Muvaffaqiyatli logout qildingiz"}
 
 
+@router.get("/me", response_model=MedSchema)
+async def get_current_user_info(current_user: Med = Depends(get_current_active_user)):
+    """
+    Hozirgi foydalanuvchining ma'lumotlarini olish
+    """
+    logger.info(f"[AUTH] User info requested: {current_user.email}")
+    return current_user
+
+
 @router.put("/profile", response_model=MedSchema)
 async def update_profile(
     profile_data: ProfileUpdate,
